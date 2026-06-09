@@ -1,0 +1,19 @@
+{
+  "name": "assay-spike",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Phase 0 spike: prove CAW primitives behave as documented and that the intent gap is real.",
+  "type": "module",
+  "scripts": {
+    "spike": "tsx src/spike.ts"
+  },
+  "dependencies": {
+    "@cobo/agentic-wallet": "0.1.7",
+    "dotenv": "^16.4.5"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.2",
+    "tsx": "^4.19.2",
+    "typescript": "^5.6.3"
+  }
+}
