@@ -1,0 +1,100 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* The assay office palette as CSS tokens. Tailwind reads the same values; these
+   exist for the few places that need raw var() access (SVG, gradients). */
+:root {
+  --paper: #faf8f3;
+  --surface: #ffffff;
+  --hairline: #e4dfd4;
+  --ink: #1a1815;
+  --muted: #8a8378;
+  --hallmark: #a8742a;
+  --oxide: #9e4a3c;
+}
+
+@layer base {
+  html {
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    background-color: var(--paper);
+    color: var(--ink);
+    font-feature-settings: 'kern', 'liga', 'tnum';
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* The only permitted gradient: a faint paper grain that serves the metaphor.
+     A warm, near-invisible certificate texture. No color, just tone. */
+  .paper-grain::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.5;
+    background-image: radial-gradient(
+      circle at 1px 1px,
+      rgba(26, 24, 21, 0.025) 1px,
+      transparent 0
+    );
+    background-size: 4px 4px;
+  }
+
+  /* Visible, calm focus state everywhere. */
+  :focus-visible {
+    outline: 2px solid var(--hallmark);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  ::selection {
+    background: rgba(168, 116, 42, 0.18);
+  }
+}
+
+@layer components {
+  /* Small tracked uppercase label, like a certificate field heading. */
+  .field-label {
+    @apply text-label uppercase text-muted font-medium;
+  }
+
+  /* Link with a left-to-right underline wipe on hover. */
+  .wipe-link {
+    position: relative;
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .wipe-link::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -2px;
+    height: 1px;
+    width: 100%;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .wipe-link:hover::after {
+    transform: scaleX(1);
+  }
+}
+
+/* Calm, instant fallback for anyone who prefers reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+  .wipe-link::after {
+    transition: none;
+  }
+}
