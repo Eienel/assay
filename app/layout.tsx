@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Atmosphere } from '@/components/Atmosphere';
 import { tokens } from '@/lib/tokens';
 import './globals.css';
 
@@ -18,6 +19,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="en">
       <body className="paper-grain min-h-screen antialiased">
+        <Atmosphere />
         <div className="relative z-10">{children}</div>
       </body>
     </html>

@@ -20,7 +20,17 @@ export function Masthead({
   judge: 'gemini' | 'claude' | 'heuristic';
 }) {
   return (
-    <header className="mb-10">
+    <header className="relative mb-10">
+      {/* The watermark: the office mark struck huge and faint behind the hero,
+          like the embossed seal showing through certificate stock. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute -right-24 -top-16 opacity-[0.045] sm:-right-32 sm:-top-20"
+        style={{ transform: 'rotate(8deg)' }}
+      >
+        <Hallmark size={420} color="var(--ink)" />
+      </div>
+
       <div className="flex items-center gap-3">
         <Hallmark size={30} title="Assay" />
         <span className="text-label uppercase tracking-[0.2em] text-ink">Assay</span>
@@ -43,7 +53,10 @@ export function Masthead({
         holds in-policy but off-intent operations for a human, instead of signing them.
       </p>
 
-      <div className="mt-9 rounded-lg border bg-surface p-5">
+      {/* The mandate card carries a double rule, outer and inner hairline, the
+          way a certificate frames its text. */}
+      <div className="relative mt-9 rounded-lg border bg-surface p-1.5 shadow-[0_1px_2px_rgba(26,24,21,0.04),0_8px_24px_-12px_rgba(26,24,21,0.12)]">
+        <div className="rounded-[7px] border border-hairline p-5">
         <div className="field-label">Mandate</div>
         <p className="mt-2 text-base text-ink">{pact.intent}</p>
 
@@ -63,6 +76,7 @@ export function Masthead({
               ))}
             </ul>
           </div>
+        </div>
         </div>
       </div>
     </header>
