@@ -67,7 +67,7 @@ export function Masthead({
 
       {/* The mandate card carries a double rule, outer and inner hairline, the
           way a certificate frames its text. */}
-      <div className="relative mt-9 rounded-lg border bg-surface p-1.5 shadow-[0_1px_2px_rgba(26,24,21,0.04),0_8px_24px_-12px_rgba(26,24,21,0.12)]">
+      <div className="relative mt-9 rounded-lg border bg-surface p-1.5 shadow-card">
         <div className="rounded-[7px] border border-hairline p-5">
         <div className="field-label">Mandate</div>
         <p className="mt-2 text-base text-ink">{pact.intent}</p>

@@ -1,9 +1,11 @@
 'use client';
 
 import { useRef, useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Play, ArrowCounterClockwise } from '@phosphor-icons/react';
 import { OperationRow, type Row } from './OperationRow';
+import { liftHover, sinkTap } from '@/lib/motion';
+import { useIsTouch } from '@/lib/useIsTouch';
 import type { AgentStep, AssayedOperation } from '@/lib/types';
 import type { CawPrecheck } from '@/lib/caw/precheck';
 
@@ -16,6 +18,9 @@ export function AssayConsole({ pact, steps }: { pact: PactInfo; steps: AgentStep
   const [running, setRunning] = useState(false);
   const [busyRow, setBusyRow] = useState<string | null>(null);
   const stepsById = useRef(new Map(steps.map((s) => [s.id, s])));
+  const reduce = useReducedMotion();
+  const touch = useIsTouch();
+  const noHover = touch || !!reduce;
 
   const update = (stepId: string, patch: Partial<Row>) =>
     setRows((prev) => prev.map((r) => (r.stepId === stepId ? { ...r, ...patch } : r)));
@@ -93,7 +98,8 @@ export function AssayConsole({ pact, steps }: { pact: PactInfo; steps: AgentStep
         <h2 className="field-label">Assay timeline</h2>
         {started && !running && (
           <motion.button
-            whileTap={{ scale: 0.97, y: 1 }}
+            whileHover={noHover ? undefined : liftHover}
+            whileTap={reduce ? undefined : sinkTap}
             onClick={run}
             className="wipe-link inline-flex items-center gap-1.5 text-sm text-muted"
           >
@@ -104,7 +110,7 @@ export function AssayConsole({ pact, steps }: { pact: PactInfo; steps: AgentStep
       </div>
 
       {!started ? (
-        <EmptyState onRun={run} intent={pact.intent} />
+        <EmptyState onRun={run} intent={pact.intent} noHover={noHover} reduce={!!reduce} />
       ) : (
         <ul className="mt-5 space-y-3">
           <AnimatePresence initial={false}>
@@ -124,7 +130,17 @@ export function AssayConsole({ pact, steps }: { pact: PactInfo; steps: AgentStep
   );
 }
 
-function EmptyState({ onRun, intent }: { onRun: () => void; intent: string }) {
+function EmptyState({
+  onRun,
+  intent,
+  noHover,
+  reduce,
+}: {
+  onRun: () => void;
+  intent: string;
+  noHover: boolean;
+  reduce: boolean;
+}) {
   return (
     <div className="mt-5 rounded-lg border border-dashed border-hairline bg-surface p-8 text-center">
       <p className="mx-auto max-w-[44ch] text-base text-muted">
@@ -133,9 +149,10 @@ function EmptyState({ onRun, intent }: { onRun: () => void; intent: string }) {
         <span className="text-ink">{trimIntent(intent)}</span> before the wallet is allowed to sign.
       </p>
       <motion.button
-        whileTap={{ scale: 0.97, y: 1 }}
+        whileHover={noHover ? undefined : liftHover}
+        whileTap={reduce ? undefined : sinkTap}
         onClick={onRun}
-        className="mt-6 inline-flex items-center gap-2 rounded border border-ink bg-ink px-5 py-2.5 text-sm font-medium text-paper transition-opacity hover:opacity-90"
+        className="mt-6 inline-flex items-center gap-2 rounded border border-ink bg-ink px-5 py-2.5 text-sm font-medium text-paper shadow-card transition-colors hover:bg-black"
       >
         <Play size={15} weight="fill" />
         Run the agent session

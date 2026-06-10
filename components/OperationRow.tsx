@@ -3,6 +3,7 @@
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, Prohibit, Warning } from '@phosphor-icons/react';
 import { Hallmark } from './Hallmark';
+import { liftHover, sinkTap } from '@/lib/motion';
 import type { AssayedOperation } from '@/lib/types';
 import type { CawPrecheck } from '@/lib/caw/precheck';
 
@@ -86,7 +87,13 @@ export function OperationRow({
       </div>
 
       {held && (
-        <ReviewPanel row={row} onRelease={onRelease} onDiscard={onDiscard} busy={busy} />
+        <ReviewPanel
+          row={row}
+          onRelease={onRelease}
+          onDiscard={onDiscard}
+          busy={busy}
+          reduce={!!reduce}
+        />
       )}
     </motion.li>
   );
@@ -218,18 +225,21 @@ function ReviewPanel({
   onRelease,
   onDiscard,
   busy,
+  reduce,
 }: {
   row: Row;
   onRelease: (stepId: string) => void;
   onDiscard: (stepId: string) => void;
   busy: boolean;
+  reduce: boolean;
 }) {
   return (
     <div className="relative mt-5 flex flex-col gap-3 border-t border-hairline pt-4 sm:flex-row sm:items-center">
       <div className="field-label">Human review</div>
       <div className="flex gap-2 sm:ml-auto">
         <motion.button
-          whileTap={{ scale: 0.97, y: 1 }}
+          whileHover={reduce ? undefined : liftHover}
+          whileTap={reduce ? undefined : sinkTap}
           disabled={busy}
           onClick={() => onDiscard(row.stepId)}
           className="rounded border border-hairline bg-surface px-4 py-2 text-sm text-ink transition-colors hover:bg-paper disabled:opacity-50"
@@ -237,7 +247,8 @@ function ReviewPanel({
           Discard
         </motion.button>
         <motion.button
-          whileTap={{ scale: 0.97, y: 1 }}
+          whileHover={reduce ? undefined : liftHover}
+          whileTap={reduce ? undefined : sinkTap}
           disabled={busy}
           onClick={() => onRelease(row.stepId)}
           className="rounded border border-oxide bg-surface px-4 py-2 text-sm text-oxide transition-colors hover:bg-paper disabled:opacity-50"
