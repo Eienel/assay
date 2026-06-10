@@ -8,9 +8,16 @@ import { checkConformance } from './conformance';
 //
 // This is the one place the two layers meet, so it is also where the two-layer
 // story is recorded: who stopped the operation, Assay or CAW.
-export async function assayStep(step: AgentStep): Promise<AssayedOperation> {
+//
+// intentOverride lets the playground judge against a mandate the visitor typed,
+// instead of the active pact's intent. The wallet's quantitative policies are
+// unaffected; only the semantic mandate changes.
+export async function assayStep(
+  step: AgentStep,
+  intentOverride?: string,
+): Promise<AssayedOperation> {
   const caw = getCawClient();
-  const intent = await caw.getActivePactIntent();
+  const intent = intentOverride?.trim() || (await caw.getActivePactIntent());
 
   const conformance = await checkConformance(intent, step.reasoning, step.operation);
 

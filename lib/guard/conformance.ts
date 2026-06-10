@@ -109,11 +109,14 @@ function checkWithHeuristic(
     };
   }
 
-  if (onIntent && operation.dstLabel) {
+  if (onIntent) {
+    // On mandate. Whether the recipient is allowlisted is the wallet's call, not
+    // Assay's, so an unknown address still passes here and the wallet decides.
+    const who = operation.dstLabel ?? 'the recipient';
     return {
       verdict: 'PASS',
       confidence: 0.82,
-      reason: `Payment to ${operation.dstLabel} tracks the mandate: ${shorten(intent)}.`,
+      reason: `Payment to ${who} tracks the mandate: ${shorten(intent)}.`,
     };
   }
 

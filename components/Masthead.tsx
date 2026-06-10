@@ -53,6 +53,18 @@ export function Masthead({
         holds in-policy but off-intent operations for a human, instead of signing them.
       </p>
 
+      <nav className="mt-6 flex flex-wrap gap-x-5 gap-y-2 text-sm">
+        <a href="#how" className="wipe-link text-muted">
+          How it works
+        </a>
+        <a href="#watch" className="wipe-link text-muted">
+          Watch an attack
+        </a>
+        <a href="#try" className="wipe-link text-muted">
+          Assay it yourself
+        </a>
+      </nav>
+
       {/* The mandate card carries a double rule, outer and inner hairline, the
           way a certificate frames its text. */}
       <div className="relative mt-9 rounded-lg border bg-surface p-1.5 shadow-[0_1px_2px_rgba(26,24,21,0.04),0_8px_24px_-12px_rgba(26,24,21,0.12)]">

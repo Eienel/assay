@@ -88,7 +88,7 @@ export function AssayConsole({ pact, steps }: { pact: PactInfo; steps: AgentStep
   const started = rows.length > 0;
 
   return (
-    <section className="mt-10">
+    <div className="mt-6">
       <div className="flex items-center justify-between">
         <h2 className="field-label">Assay timeline</h2>
         {started && !running && (
@@ -120,7 +120,7 @@ export function AssayConsole({ pact, steps }: { pact: PactInfo; steps: AgentStep
           </AnimatePresence>
         </ul>
       )}
-    </section>
+    </div>
   );
 }
 

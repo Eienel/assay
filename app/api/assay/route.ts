@@ -11,12 +11,12 @@ export const dynamic = 'force-dynamic';
 // quantitative counterfactual, so the UI can show what CAW alone would have done.
 export async function POST(request: Request) {
   try {
-    const body = (await request.json()) as { step?: AgentStep };
+    const body = (await request.json()) as { step?: AgentStep; intent?: string };
     if (!body.step) {
       return NextResponse.json({ error: 'Missing step.' }, { status: 400 });
     }
 
-    const assayed = await assayStep(body.step);
+    const assayed = await assayStep(body.step, body.intent);
     const cawPrecheck = predictCawQuantitative(body.step.operation);
 
     return NextResponse.json({
