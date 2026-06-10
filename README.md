@@ -60,8 +60,9 @@ in-bounds-but-wrong.**
 - The guard is provider-agnostic behind a single function:
   - `lib/guard/conformance.ts` `checkConformance(intent, reasoning, operation)`
     returns `{ verdict, confidence, reason }`.
-  - `lib/guard/provider.ts` the only model touchpoint (Claude today). A
-    transparent heuristic runs when no provider is configured.
+  - `lib/guard/provider.ts` the only model touchpoint. Two providers are wired,
+    Gemini (free tier) and Claude, selected automatically or forced with
+    `ASSAY_JUDGE_PROVIDER`. A transparent heuristic runs when no key is set.
   - `lib/guard/orchestrator.ts` wraps an operation: conformance first, then CAW.
 - `lib/caw/precheck.ts` the counterfactual that shows, on a held row, that CAW
   alone would have signed it.
@@ -85,8 +86,8 @@ npm run dev      # http://localhost:3000
 ```
 
 It runs fully in demo mode with no keys: a mock CAW client and a heuristic
-judge. To use the model judge or the live testnet, copy `.env.local.example` to
-`.env.local` and fill it in.
+judge. To use a model judge (Gemini's free tier or Claude) or the live testnet,
+copy `.env.local.example` to `.env.local` and fill it in.
 
 Press **Run the agent session** to play the scripted scenario.
 

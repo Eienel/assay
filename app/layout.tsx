@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { tokens } from '@/lib/tokens';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -10,7 +11,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: 'device-width',
   initialScale: 1,
-  themeColor: '#FAF8F3',
+  themeColor: tokens.paper,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

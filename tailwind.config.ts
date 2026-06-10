@@ -1,4 +1,5 @@
 import type { Config } from 'tailwindcss';
+import { tokens } from './lib/tokens';
 
 // The assay office palette. These are the only colors. Never hardcode hex
 // anywhere else; reference these tokens.
@@ -17,15 +18,7 @@ const config: Config = {
       '3xl': ['2.5rem', { lineHeight: '2.8rem' }],
     },
     extend: {
-      colors: {
-        paper: '#FAF8F3',
-        surface: '#FFFFFF',
-        hairline: '#E4DFD4',
-        ink: '#1A1815',
-        muted: '#8A8378',
-        hallmark: '#A8742A',
-        oxide: '#9E4A3C',
-      },
+      colors: tokens,
       fontFamily: {
         sans: [
           '-apple-system',
@@ -47,7 +40,7 @@ const config: Config = {
         ],
       },
       borderColor: {
-        DEFAULT: '#E4DFD4',
+        DEFAULT: tokens.hairline,
       },
       borderRadius: {
         sm: '6px',

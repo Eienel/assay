@@ -146,11 +146,9 @@ function Verdict({ row }: { row: Row }) {
 
     case 'passed':
     case 'released': {
-      const tx = row.releaseTxHash ?? row.assayed?.caw;
       const hash =
         row.releaseTxHash ??
         (row.assayed?.caw.status === 'submitted' ? row.assayed.caw.transactionHash : undefined);
-      void tx;
       return (
         <div className="mt-4">
           <Tag tone="hallmark">

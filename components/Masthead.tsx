@@ -17,7 +17,7 @@ export function Masthead({
 }: {
   pact: PactInfo;
   mode: 'mock' | 'live';
-  judge: 'model' | 'heuristic';
+  judge: 'gemini' | 'claude' | 'heuristic';
 }) {
   return (
     <header className="mb-10">
@@ -26,7 +26,9 @@ export function Masthead({
         <span className="text-label uppercase tracking-[0.2em] text-ink">Assay</span>
         <span className="ml-auto flex items-center gap-2">
           <Chip>{mode === 'live' ? 'Live testnet' : 'Demo'}</Chip>
-          <Chip>{judge === 'model' ? 'Model judge' : 'Heuristic judge'}</Chip>
+          <Chip>
+            {judge === 'gemini' ? 'Gemini judge' : judge === 'claude' ? 'Claude judge' : 'Heuristic judge'}
+          </Chip>
         </span>
       </div>
 

@@ -2,7 +2,7 @@
 
 Tone: calm, precise, a little dry. No hype. Let the product be the proof.
 
-## 0:00 to 0:30 — The gap
+## 0:00 to 0:30, The gap
 
 On camera: the Assay masthead.
 
@@ -14,7 +14,7 @@ There is a second question they never ask: is this the transaction the agent was
 supposed to make? A payment can be perfectly in bounds and still be the wrong
 payment. A prompt injection. A hallucination. Goal drift."
 
-## 0:30 to 1:10 — We proved it on testnet
+## 0:30 to 1:10, We proved it on testnet
 
 Cut to the spike summary / README testnet evidence.
 
@@ -28,7 +28,7 @@ it. Zero questions.
 
 That third transfer is the whole problem. It is in policy, and it is wrong."
 
-## 1:10 to 1:40 — What Assay is
+## 1:10 to 1:40, What Assay is
 
 Back to the masthead. Point to the mandate and the policy block.
 
@@ -37,7 +37,7 @@ it reads the agent's reasoning for each step, and it makes one judgment: does
 this operation conform to the mandate? Pass, hold, or block. Only a pass reaches
 the wallet."
 
-## 1:40 to 3:00 — The hero run
+## 1:40 to 3:00, The hero run
 
 Press **Run the agent session**. Narrate as rows resolve.
 
@@ -60,7 +60,7 @@ Assay holds it." (The oxide streak draws across the row.) "Off intent. The
 reasoning is driven by an out-of-band instruction, not by a verified invoice. It
 never reaches the wallet. A human gets to decide."
 
-## 3:00 to 3:40 — The two layers, the human
+## 3:00 to 3:40, The two layers, the human
 
 Point at the three rows together.
 
@@ -71,7 +71,7 @@ have cost you the money.
 The held payment waits for a person. Sign anyway, or discard. The genuine metal
 takes the hallmark. The base metal oxidizes when you assay it."
 
-## 3:40 to 4:10 — Close
+## 3:40 to 4:10, Close
 
 Back to the masthead.
 
