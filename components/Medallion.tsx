@@ -15,25 +15,28 @@ const BRASS = '#A8742A';
 const BRASS_DEEP = '#7c521b';
 
 function Relief() {
-  // The assayer's A, in raised relief on the face, plus the struck dot.
-  const bar = (
-    <meshStandardMaterial color={BRASS_DEEP} metalness={1} roughness={0.22} />
-  );
+  // The assayer's A: apex at the top, legs splaying to the base, a crossbar in
+  // the lower third, and the struck dot below the baseline. Matches the logo.
+  const bar = <meshStandardMaterial color={BRASS_DEEP} metalness={1} roughness={0.22} />;
   return (
-    <group position={[0, 0.04, 0.1]}>
-      <mesh position={[-0.24, 0, 0]} rotation={[0, 0, 0.36]}>
+    <group position={[0, 0.06, 0.1]}>
+      {/* left leg: top toward centre, bottom splayed out */}
+      <mesh position={[-0.24, 0, 0]} rotation={[0, 0, -0.36]}>
         <boxGeometry args={[0.13, 0.95, 0.08]} />
         {bar}
       </mesh>
-      <mesh position={[0.24, 0, 0]} rotation={[0, 0, -0.36]}>
+      {/* right leg: mirror */}
+      <mesh position={[0.24, 0, 0]} rotation={[0, 0, 0.36]}>
         <boxGeometry args={[0.13, 0.95, 0.08]} />
         {bar}
       </mesh>
-      <mesh position={[0, -0.13, 0]}>
-        <boxGeometry args={[0.44, 0.13, 0.08]} />
+      {/* crossbar, lower third */}
+      <mesh position={[0, -0.14, 0]}>
+        <boxGeometry args={[0.42, 0.13, 0.08]} />
         {bar}
       </mesh>
-      <mesh position={[0, -0.56, 0]}>
+      {/* struck dot, below the baseline */}
+      <mesh position={[0, -0.62, 0]}>
         <cylinderGeometry args={[0.075, 0.075, 0.08, 24]} />
         {bar}
       </mesh>
@@ -49,17 +52,17 @@ function Coin({ reduce }: { reduce: boolean }) {
     if (!g) return;
     const t = state.clock.elapsedTime;
     // Pointer parallax, eased. Pointer rests at 0 on touch, so it sits still.
-    const px = state.pointer.x * 0.45;
-    const py = state.pointer.y * 0.3;
+    const px = state.pointer.x * 0.3;
+    const py = state.pointer.y * 0.2;
     if (reduce) {
-      g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, -0.06, 0.1);
-      g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, -0.18, 0.1);
+      g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, -0.05, 0.1);
+      g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, -0.12, 0.1);
       return;
     }
-    // A slow living tilt, the coin examined under the light. Always face-on
-    // enough to read the hallmark; never a full spin.
-    const targetY = Math.sin(t * 0.5) * 0.4 + px;
-    const targetX = -0.05 + Math.cos(t * 0.4) * 0.06 - py;
+    // A slow living tilt, the coin examined under the light. Kept shallow so it
+    // never clips the frame; always face-on enough to read the hallmark.
+    const targetY = Math.sin(t * 0.5) * 0.28 + px;
+    const targetX = -0.04 + Math.cos(t * 0.4) * 0.05 - py;
     g.rotation.y = THREE.MathUtils.lerp(g.rotation.y, targetY, 0.05);
     g.rotation.x = THREE.MathUtils.lerp(g.rotation.x, targetX, 0.05);
     void delta;
@@ -87,7 +90,7 @@ export default function Medallion() {
   return (
     <Canvas
       dpr={[1, 2]}
-      camera={{ position: [0, 0.1, 4.1], fov: 36 }}
+      camera={{ position: [0, 0.05, 5.2], fov: 32 }}
       gl={{ alpha: true, antialias: true, preserveDrawingBuffer: true }}
       style={{ background: 'transparent' }}
     >
