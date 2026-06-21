@@ -11,6 +11,7 @@ export interface Source {
   handle: string;
   payTo: `0x${string}`;
   text: string;
+  live?: boolean; // true for sources pulled live from a real RSS publication
 }
 
 export const SOURCES: Source[] = [

@@ -1,13 +1,16 @@
 import { BatchFacilitatorClient } from '@circle-fin/x402-batching/server';
 import { buildRequirements } from '@/lib/arc';
 import { sourceById } from '@/lib/sources';
+import { walletForId } from '@/lib/rss';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 
 // An x402-priced source endpoint. Charging `micros` USDC, paid to the source's
 // wallet, settled through Circle Gateway. This is the toll booth a source sits
-// behind: reading it costs a fraction of a cent.
+// behind: reading it costs a fraction of a cent. Static sources resolve their
+// wallet from the registry; live (RSS) sources derive it deterministically from
+// the id, so no shared state is needed.
 const facilitator = new BatchFacilitatorClient();
 
 export async function GET(request: Request) {
@@ -15,17 +18,18 @@ export async function GET(request: Request) {
   const id = url.searchParams.get('id') ?? '';
   const micros = parseInt(url.searchParams.get('micros') ?? '0', 10);
   const source = sourceById(id);
-  if (!source || micros <= 0) {
+  const payTo = source?.payTo ?? walletForId(id);
+  if (!id || micros <= 0) {
     return new Response(JSON.stringify({ error: 'unknown source' }), { status: 404 });
   }
 
-  const requirements = buildRequirements(micros, source.payTo);
+  const requirements = buildRequirements(micros, payTo);
   const sig = request.headers.get('payment-signature');
 
   if (!sig) {
     const required = {
       x402Version: 2,
-      resource: { url: url.pathname, description: source.name, mimeType: 'application/json' },
+      resource: { url: url.pathname, description: source?.name ?? id, mimeType: 'application/json' },
       accepts: [requirements],
     };
     return new Response('{}', {
@@ -47,7 +51,7 @@ export async function GET(request: Request) {
     if (!settle.success) {
       return new Response(JSON.stringify({ error: settle.errorReason }), { status: 402 });
     }
-    return new Response(JSON.stringify({ content: source.text, tx: settle.transaction }), {
+    return new Response(JSON.stringify({ content: source?.text ?? "", tx: settle.transaction }), {
       status: 200,
       headers: {
         'content-type': 'application/json',

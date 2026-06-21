@@ -3,7 +3,6 @@ import { retrieve } from '@/lib/retrieve';
 import { groundedAnswer } from '@/lib/answer';
 import { attribute } from '@/lib/verifier';
 import { ensureDeposit, getGateway, payToSource } from '@/lib/arc';
-import { sourceById } from '@/lib/sources';
 import { record } from '@/lib/ledger';
 import type { GroundResult, Settlement } from '@/lib/types';
 
@@ -22,13 +21,14 @@ export async function POST(request: Request) {
     }
 
     const toll = parseFloat(process.env.OBOL_TOLL_USDC ?? '0.003');
-    const retrieved = retrieve(question, 4);
+    const retrieved = await retrieve(question, 4);
     const { answer } = await groundedAnswer(question, retrieved);
     const { sources, method } = await attribute(question, answer, retrieved);
 
+    const byId = new Map(retrieved.map((r) => [r.id, r]));
     const grounded = sources.filter((s) => s.grounded && s.weight > 0);
     const settlements: Settlement[] = grounded.map((s) => {
-      const src = sourceById(s.id)!;
+      const src = byId.get(s.id)!;
       const micros = Math.max(1, Math.round(toll * 1e6 * s.weight));
       return {
         sourceId: s.id,
@@ -48,8 +48,7 @@ export async function POST(request: Request) {
         const total = settlements.reduce((s, x) => s + x.micros, 0);
         await ensureDeposit(total);
         for (const s of settlements) {
-          const src = sourceById(s.sourceId)!;
-          s.txId = await payToSource(origin, src, s.micros);
+          s.txId = await payToSource(origin, s.sourceId, s.payTo, s.micros);
         }
         live = true;
       } catch (e) {

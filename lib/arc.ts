@@ -1,6 +1,5 @@
 import 'server-only';
 import { GatewayClient } from '@circle-fin/x402-batching/client';
-import type { Source } from './sources';
 
 // Arc testnet, from the Circle x402-batching SDK.
 export const ARC_NETWORK = 'eip155:5042002';
@@ -45,15 +44,17 @@ export async function ensureDeposit(neededMicros: number): Promise<void> {
 }
 
 // Pay one source its weighted share by calling our own x402 source endpoint.
-// Returns the on-chain settlement id reported by the seller route.
+// Returns the settlement id reported by the seller route. payTo is passed so
+// live (RSS) sources resolve without any shared registry state.
 export async function payToSource(
   baseUrl: string,
-  source: Source,
+  id: string,
+  payTo: string,
   micros: number,
 ): Promise<string | undefined> {
   const g = getGateway();
   if (!g) throw new Error('No funder key');
-  const url = `${baseUrl}/api/source?id=${source.id}&micros=${micros}`;
+  const url = `${baseUrl}/api/source?id=${encodeURIComponent(id)}&payTo=${payTo}&micros=${micros}`;
   const res = (await g.pay(url, { method: 'GET' })) as { data?: { tx?: string } };
   return res.data?.tx;
 }
