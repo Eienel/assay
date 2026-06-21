@@ -1,18 +1,23 @@
 {
-  "name": "assay-spike",
+  "name": "touchstone-spike",
   "version": "0.0.0",
   "private": true,
-  "description": "Phase 0 spike: prove CAW primitives behave as documented and that the intent gap is real.",
   "type": "module",
+  "description": "Phase 0 spike: prove an x402 + Circle Gateway nanopayment clears on Arc, and that the attribution verifier produces a sane per-source split.",
   "scripts": {
+    "wallets": "tsx src/wallet.ts",
+    "verifier": "tsx src/verifier.ts",
     "spike": "tsx src/spike.ts"
   },
   "dependencies": {
-    "@cobo/agentic-wallet": "0.1.7",
-    "dotenv": "^16.4.5"
+    "@circle-fin/x402-batching": "^2.0.4",
+    "@x402/core": "^2.16.0",
+    "@x402/evm": "^2.16.0",
+    "dotenv": "^16.4.5",
+    "viem": "^2.47.1"
   },
   "devDependencies": {
-    "@types/node": "^25.9.2",
+    "@types/node": "^22.7.5",
     "tsx": "^4.19.2",
     "typescript": "^5.6.3"
   }

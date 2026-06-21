@@ -2,8 +2,7 @@
 
 import { useEffect, useState } from 'react';
 
-// True on coarse-pointer devices. Used to strip hover-dependent flourishes
-// (lift, tilt, magnetic) on phones, where they only cause sticky states.
+// True on coarse-pointer devices, so hover-only flourishes can be removed.
 export function useIsTouch(): boolean {
   const [touch, setTouch] = useState(false);
   useEffect(() => {

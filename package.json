@@ -1,5 +1,5 @@
 {
-  "name": "assay",
+  "name": "obol",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,21 +10,20 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@cobo/agentic-wallet": "0.1.7",
+    "@circle-fin/x402-batching": "^2.1.0",
     "@phosphor-icons/react": "^2.1.7",
-    "@react-three/drei": "^9.122.0",
-    "@react-three/fiber": "^8.18.0",
+    "@x402/core": "^2.16.0",
+    "@x402/evm": "^2.16.0",
     "framer-motion": "^11.11.0",
     "next": "14.2.15",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "three": "^0.169.0"
+    "viem": "^2.47.1"
   },
   "devDependencies": {
     "@types/node": "^22.7.5",
     "@types/react": "^18.3.11",
     "@types/react-dom": "^18.3.0",
-    "@types/three": "^0.169.0",
     "autoprefixer": "^10.4.20",
     "postcss": "^8.4.47",
     "tailwindcss": "^3.4.13",

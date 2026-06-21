@@ -2,142 +2,62 @@
 @tailwind components;
 @tailwind utilities;
 
-/* The assay office palette as CSS tokens. Tailwind reads the same values; these
-   exist for the few places that need raw var() access (SVG, gradients). */
 :root {
-  --paper: #faf8f3;
+  --stone: #f3f4f1;
   --surface: #ffffff;
-  --hairline: #e4dfd4;
-  --ink: #1a1815;
-  --muted: #8a8378;
-  --hallmark: #a8742a;
-  --oxide: #9e4a3c;
+  --hairline: #e4e5e0;
+  --ink: #181a19;
+  --muted: #6e726d;
+  --accent: #1f7a60;
+  --accent-soft: #e9f1ed;
 }
 
 @layer base {
   html {
     -webkit-text-size-adjust: 100%;
   }
-
   body {
-    background-color: var(--paper);
+    background-color: var(--stone);
     color: var(--ink);
     font-feature-settings: 'kern', 'liga', 'tnum';
     -webkit-font-smoothing: antialiased;
     text-rendering: optimizeLegibility;
   }
-
-  /* The paper material. Two fixed layers serve the metaphor and nothing else:
-     a fibrous grain so the surface reads as stock rather than screen, and a
-     warm vignette so the page sits in light like a photographed certificate.
-     No color, just tone. */
-  .paper-grain::before {
+  /* A barely-there stone grain so the background is a material, not a hex. */
+  .grain::before {
     content: '';
     position: fixed;
     inset: 0;
     z-index: 0;
     pointer-events: none;
-    opacity: 0.55;
-    background-image:
-      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='f'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23f)' opacity='0.05'/%3E%3C/svg%3E"),
-      radial-gradient(circle at 1px 1px, rgba(26, 24, 21, 0.022) 1px, transparent 0);
-    background-size: 240px 240px, 4px 4px;
+    opacity: 0.5;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.035'/%3E%3C/svg%3E");
+    background-size: 200px 200px;
   }
-
-  .paper-grain::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background: radial-gradient(
-      130% 90% at 50% 0%,
-      transparent 55%,
-      rgba(26, 24, 21, 0.06) 100%
-    );
-  }
-
-  /* Crucible smoke. Large-scale turbulence in warm gray, drifting very slowly.
-     Two layers at different speeds give it depth without ever calling
-     attention to itself. Transform and opacity only. */
-  .smoke-layer {
-    position: fixed;
-    inset: -20%;
-    z-index: 0;
-    pointer-events: none;
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='900' height='900'%3E%3Cfilter id='s'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.006 0.009' numOctaves='3' seed='8' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='0 0 0 0 0.1 0 0 0 0 0.094 0 0 0 0 0.082 0 0 0 0.6 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23s)'/%3E%3C/svg%3E");
-    background-size: 900px 900px;
-    -webkit-mask-image: radial-gradient(90% 50% at 50% 8%, black 0%, transparent 72%);
-    mask-image: radial-gradient(90% 50% at 50% 8%, black 0%, transparent 72%);
-  }
-  .smoke-a {
-    opacity: 0.04;
-    animation: smoke-drift 140s linear infinite alternate;
-  }
-  .smoke-b {
-    opacity: 0.028;
-    animation: smoke-drift 90s linear infinite alternate-reverse;
-  }
-  @keyframes smoke-drift {
-    from {
-      transform: translate3d(-2.5%, -1%, 0) scale(1);
-    }
-    to {
-      transform: translate3d(2.5%, 1.5%, 0) scale(1.06);
-    }
-  }
-
-  /* Gold dust in the air of the office: a few motes in the hallmark brass,
-     rising slowly through the hero. Sparse on purpose. */
-  .mote {
-    position: absolute;
-    border-radius: 9999px;
-    background: var(--hallmark);
-    pointer-events: none;
-    animation: mote-rise linear infinite;
-  }
-  @keyframes mote-rise {
-    0% {
-      transform: translate3d(0, 0, 0);
-      opacity: 0;
-    }
-    12% {
-      opacity: var(--mote-opacity, 0.3);
-    }
-    88% {
-      opacity: var(--mote-opacity, 0.3);
-    }
-    100% {
-      transform: translate3d(var(--mote-sway, 14px), -46vh, 0);
-      opacity: 0;
-    }
-  }
-
-  /* Visible, calm focus state everywhere. */
   :focus-visible {
-    outline: 2px solid var(--hallmark);
+    outline: 2px solid var(--accent);
     outline-offset: 2px;
     border-radius: 4px;
   }
-
   ::selection {
-    background: rgba(168, 116, 42, 0.18);
+    background: rgba(31, 122, 96, 0.16);
   }
 }
 
 @layer components {
-  /* Small tracked uppercase label, like a certificate field heading. */
-  .field-label {
+  .label {
     @apply text-label uppercase text-muted font-medium;
   }
-
-  /* Link with a left-to-right underline wipe on hover. */
-  .wipe-link {
+  /* Tabular figures for every number, so columns of facts align. */
+  .mono {
+    font-variant-numeric: tabular-nums;
+    @apply font-mono;
+  }
+  .wipe {
     position: relative;
-    color: var(--ink);
     text-decoration: none;
   }
-  .wipe-link::after {
+  .wipe::after {
     content: '';
     position: absolute;
     left: 0;
@@ -147,15 +67,25 @@
     background: currentColor;
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+    transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  .wipe-link:hover::after {
+  .wipe:hover::after {
     transform: scaleX(1);
+  }
+  @keyframes obol-float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-7px);
+    }
+  }
+  .float {
+    animation: obol-float 6.5s ease-in-out infinite;
   }
 }
 
-/* Calm, instant fallback for anyone who prefers reduced motion. The air goes
-   still: smoke holds its frame, the dust settles into place. */
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,
@@ -164,15 +94,7 @@
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-  .wipe-link::after {
+  .wipe::after {
     transition: none;
-  }
-  .smoke-a,
-  .smoke-b {
-    animation: none;
-  }
-  .mote {
-    animation: none;
-    opacity: 0.18;
   }
 }

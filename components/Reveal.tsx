@@ -3,8 +3,8 @@
 import { motion, useReducedMotion } from 'framer-motion';
 import { reveal, stagger } from '@/lib/motion';
 
-// Scroll reveal via framer-motion whileInView (IntersectionObserver under the
-// hood), once only. Collapses to a plain block under reduced motion.
+// Scroll reveal via whileInView (IntersectionObserver), once. Collapses to a
+// plain block under reduced motion. No raw scroll listeners anywhere.
 export function Reveal({
   children,
   className,
@@ -12,12 +12,12 @@ export function Reveal({
 }: {
   children: React.ReactNode;
   className?: string;
-  as?: 'div' | 'section' | 'li';
+  as?: 'div' | 'section' | 'li' | 'header';
 }) {
   const reduce = useReducedMotion();
   const Comp = motion[as];
   if (reduce) {
-    const Plain = as;
+    const Plain = as as React.ElementType;
     return <Plain className={className}>{children}</Plain>;
   }
   return (
@@ -33,7 +33,6 @@ export function Reveal({
   );
 }
 
-// A container that staggers its Reveal-style children into view.
 export function RevealGroup({
   children,
   className,
@@ -56,7 +55,6 @@ export function RevealGroup({
   );
 }
 
-// A child of RevealGroup. Rises as its turn comes up in the stagger.
 export function RevealItem({
   children,
   className,
