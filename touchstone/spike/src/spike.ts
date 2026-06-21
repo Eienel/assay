@@ -70,7 +70,7 @@ function buildRequirements(micros: number, payTo: string) {
     asset: ARC_USDC,
     amount: micros.toString(),
     payTo,
-    maxTimeoutSeconds: 345600,
+    maxTimeoutSeconds: 1209600,
     extra: { name: 'GatewayWalletBatched', version: '1', verifyingContract: GATEWAY_WALLET },
   };
 }
@@ -166,6 +166,16 @@ async function main() {
       console.log(`Depositing ${TOLL_USDC} USDC into the Gateway wallet...`);
       const dep = await gateway.deposit(TOLL_USDC.toString());
       console.log(`deposit tx: ${dep.depositTxHash}`);
+    }
+    // Wait for the deposit to become spendable in the Gateway wallet.
+    const need = BigInt(Math.round(TOLL_USDC * 1e6));
+    for (let i = 0; i < 15; i++) {
+      const b = await gateway.getBalances();
+      if (b.gateway.available >= need) {
+        console.log(`gateway available: ${b.gateway.formattedAvailable}`);
+        break;
+      }
+      await new Promise((r) => setTimeout(r, 2000));
     }
 
     section('Step 3: settle the split (one nanopayment per grounded source)');
