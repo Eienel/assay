@@ -48,9 +48,13 @@ export function Ledger() {
 
   useEffect(() => {
     load();
-    const onSettled = () => load();
+    const onSettled = (e: Event) => {
+      const detail = (e as CustomEvent<GroundResult>).detail;
+      if (detail) setSnap((prev) => merge(prev, detail));
+      else load();
+    };
     window.addEventListener('obol:settled', onSettled);
-    const t = setInterval(load, 15000);
+    const t = setInterval(load, 20000);
     return () => {
       window.removeEventListener('obol:settled', onSettled);
       clearInterval(t);
@@ -65,19 +69,25 @@ export function Ledger() {
     setProgress({ done: 0, total: batch.length });
     for (let i = 0; i < batch.length; i++) {
       try {
-        await fetch('/api/ground', {
+        const res = await fetch('/api/ground', {
           method: 'POST',
           headers: { 'content-type': 'application/json' },
           body: JSON.stringify({ question: batch[i] }),
         });
+        if (res.ok) {
+          // Show the result immediately, so coins land without waiting on the
+          // (possibly different) ledger instance.
+          const r = (await res.json()) as GroundResult;
+          setSnap((prev) => merge(prev, r));
+        }
       } catch {
         /* keep going */
       }
       setProgress({ done: i + 1, total: batch.length });
-      await load();
     }
     setRunning(false);
     runningRef.current = false;
+    load();
   }
 
   const t = snap?.totals;
@@ -91,11 +101,7 @@ export function Ledger() {
             Arc.
           </p>
         </div>
-        <button
-          onClick={runAgent}
-          disabled={running}
-          className="inline-flex shrink-0 items-center gap-2 rounded bg-accent px-4 py-2 text-sm font-medium text-stone transition-transform active:translate-y-px disabled:opacity-60"
-        >
+        <button onClick={runAgent} disabled={running} className="btn btn-glass-accent px-4 py-2 disabled:opacity-60">
           {running ? (
             <>
               <CircleNotch size={15} className="animate-spin" />
@@ -124,7 +130,7 @@ export function Ledger() {
               key={it.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass rounded-lg p-4 sm:px-5"
+              className="glass ticks rounded-lg p-4 sm:px-5"
             >
               <div className="flex items-baseline justify-between gap-3">
                 <span className="truncate text-sm text-ink">{it.question}</span>
@@ -150,6 +156,36 @@ export function Ledger() {
       </ul>
     </section>
   );
+}
+
+// Fold a fresh result into the snapshot so coins appear instantly, without
+// depending on which serverless instance answers the next ledger read.
+function merge(prev: Snapshot | null, r: GroundResult): Snapshot {
+  const seen = new Set<string>();
+  const items = [r, ...(prev?.items ?? [])].filter((it) => {
+    if (seen.has(it.id)) return false;
+    seen.add(it.id);
+    return true;
+  }).slice(0, 200);
+  let micros = 0;
+  let citations = 0;
+  const per = new Set<string>();
+  for (const it of items)
+    for (const s of it.settlements) {
+      micros += s.micros;
+      citations += 1;
+      per.add(s.handle);
+    }
+  return {
+    items,
+    totals: {
+      answers: items.length,
+      citations,
+      micros,
+      usdc: (micros / 1e6).toFixed(6),
+      sourcesPaid: per.size,
+    },
+  };
 }
 
 function Stat({ value, label }: { value: React.ReactNode; label: string }) {

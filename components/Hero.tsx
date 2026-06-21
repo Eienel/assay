@@ -16,13 +16,10 @@ export function Hero() {
           Split by what the answer actually used, on Arc, in USDC.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-3">
-          <a
-            href="#ask"
-            className="inline-flex items-center rounded bg-accent px-5 py-2.5 text-sm font-medium text-stone shadow-card transition-transform active:translate-y-px"
-          >
+          <a href="#ask" className="btn btn-accent px-5 py-2.5">
             Try it live
           </a>
-          <a href="#how" className="wipe px-1 text-sm text-muted hover:text-ink">
+          <a href="#how" className="btn btn-glass px-5 py-2.5">
             How it works
           </a>
         </div>
@@ -30,10 +27,10 @@ export function Hero() {
 
       {/* A small glass chip holding the coin, not a giant logo. */}
       <div className="hidden justify-end md:flex">
-        <div className="glass float flex items-center gap-3 rounded-xl px-4 py-3">
+        <div className="glass ticks float flex items-center gap-3 rounded-xl px-5 py-4">
           <Coin size={64} />
           <div className="leading-tight">
-            <div className="mono text-sm text-ink">0.000001</div>
+            <div className="mono text-base text-ink">0.000001</div>
             <div className="label">smallest coin</div>
           </div>
         </div>

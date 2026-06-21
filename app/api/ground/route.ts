@@ -69,7 +69,7 @@ export async function POST(request: Request) {
       live,
       ts: Date.now(),
     };
-    record(result);
+    await record(result);
     return NextResponse.json(result);
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });

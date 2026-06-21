@@ -1,24 +1,60 @@
 import type { GroundResult } from './types';
 
-// In-memory ledger of settlements. Survives within a warm server instance,
-// which is all the live demo needs. A global keeps it stable across dev HMR.
-interface Store {
-  items: GroundResult[];
-}
-const g = globalThis as unknown as { __obolLedger?: Store };
-const store: Store = (g.__obolLedger ??= { items: [] });
+// Durable ledger. When Vercel KV / Upstash Redis is configured (KV_REST_API_URL
+// + KV_REST_API_TOKEN) it persists across serverless instances; otherwise it
+// falls back to an in-memory store (fine for local and single-instance demos).
 
-export function record(result: GroundResult) {
-  store.items.unshift(result);
-  if (store.items.length > 200) store.items.length = 200;
+const KV_URL = process.env.KV_REST_API_URL;
+const KV_TOKEN = process.env.KV_REST_API_TOKEN;
+const KEY = 'obol:ledger';
+const CAP = 200;
+
+const g = globalThis as unknown as { __obolLedger?: GroundResult[] };
+const mem: GroundResult[] = (g.__obolLedger ??= []);
+
+async function kv(cmd: unknown[]): Promise<unknown> {
+  const res = await fetch(KV_URL as string, {
+    method: 'POST',
+    headers: { authorization: `Bearer ${KV_TOKEN}`, 'content-type': 'application/json' },
+    body: JSON.stringify(cmd),
+    cache: 'no-store',
+  });
+  if (!res.ok) throw new Error(`KV ${res.status}`);
+  return (await res.json()) as { result: unknown };
 }
 
-export function snapshot() {
-  const items = store.items;
+export async function record(result: GroundResult): Promise<void> {
+  if (KV_URL && KV_TOKEN) {
+    try {
+      await kv(['LPUSH', KEY, JSON.stringify(result)]);
+      await kv(['LTRIM', KEY, 0, CAP - 1]);
+      return;
+    } catch {
+      /* fall through to memory */
+    }
+  }
+  mem.unshift(result);
+  if (mem.length > CAP) mem.length = CAP;
+}
+
+async function items(): Promise<GroundResult[]> {
+  if (KV_URL && KV_TOKEN) {
+    try {
+      const out = (await kv(['LRANGE', KEY, 0, CAP - 1])) as { result: string[] };
+      return (out.result ?? []).map((s) => JSON.parse(s) as GroundResult);
+    } catch {
+      /* fall through to memory */
+    }
+  }
+  return mem;
+}
+
+export async function snapshot() {
+  const list = await items();
   let micros = 0;
   let citations = 0;
   const perSource = new Map<string, number>();
-  for (const it of items) {
+  for (const it of list) {
     for (const s of it.settlements) {
       micros += s.micros;
       citations += 1;
@@ -26,9 +62,9 @@ export function snapshot() {
     }
   }
   return {
-    items,
+    items: list,
     totals: {
-      answers: items.length,
+      answers: list.length,
       citations,
       micros,
       usdc: (micros / 1e6).toFixed(6),

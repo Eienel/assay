@@ -38,7 +38,7 @@ export function AskConsole() {
       if (!res.ok) throw new Error((await res.json()).error ?? `Request failed (${res.status})`);
       const data = (await res.json()) as GroundResult;
       setResult(data);
-      window.dispatchEvent(new CustomEvent('obol:settled'));
+      window.dispatchEvent(new CustomEvent('obol:settled', { detail: data }));
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Something went wrong.');
     } finally {
@@ -67,11 +67,7 @@ export function AskConsole() {
           placeholder="Ask anything about Arc, x402, or nanopayments..."
           className="min-w-0 flex-1 bg-transparent px-3 py-2 text-base text-ink outline-none placeholder:text-muted"
         />
-        <button
-          type="submit"
-          disabled={loading || !q.trim()}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded bg-accent px-4 py-2 text-sm font-medium text-stone transition-transform active:translate-y-px disabled:opacity-50"
-        >
+        <button type="submit" disabled={loading || !q.trim()} className="btn btn-accent px-4 py-2 disabled:opacity-50">
           {loading ? <CircleNotch size={15} className="animate-spin" /> : <ArrowRight size={15} weight="bold" />}
           Ask
         </button>
@@ -86,7 +82,7 @@ export function AskConsole() {
               ask(e);
             }}
             disabled={loading}
-            className="rounded-full border border-hairline px-3 py-1 text-micro text-muted transition-colors hover:border-ink hover:text-ink disabled:opacity-50"
+            className="btn-glass rounded-full px-3 py-1 text-micro text-muted hover:text-ink disabled:opacity-50"
           >
             {e}
           </button>
@@ -117,7 +113,7 @@ function Result({ result, reduce }: { result: GroundResult; reduce: boolean }) {
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={SPRING}
-      className="glass rounded-lg"
+      className="glass ticks rounded-lg"
     >
       <div className="border-b border-hairline p-5">
         <div className="flex items-center justify-between gap-3">
