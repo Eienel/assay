@@ -9,8 +9,8 @@ export const liftHover = { y: -1, transition: { duration: 0.18, ease: EASE } };
 export const sinkTap = { y: 1, scale: 0.985, transition: { duration: 0.1, ease: EASE } };
 
 export const reveal: Variants = {
-  hidden: { opacity: 0, y: 14 },
-  shown: { opacity: 1, y: 0, transition: SPRING },
+  hidden: { opacity: 0, y: 8 },
+  shown: { opacity: 1, y: 0, transition: { duration: 0.5, ease: EASE } },
 };
 
 export const stagger: Variants = {

@@ -59,7 +59,7 @@ export function AskConsole() {
           e.preventDefault();
           ask(q);
         }}
-        className="mt-7 flex items-center gap-2 rounded-lg border bg-surface p-2 shadow-card"
+        className="glass mt-7 flex items-center gap-2 rounded-lg p-2"
       >
         <input
           value={q}
@@ -70,7 +70,7 @@ export function AskConsole() {
         <button
           type="submit"
           disabled={loading || !q.trim()}
-          className="inline-flex shrink-0 items-center gap-1.5 rounded bg-accent px-4 py-2 text-sm font-medium text-white transition-transform active:translate-y-px disabled:opacity-50"
+          className="inline-flex shrink-0 items-center gap-1.5 rounded bg-accent px-4 py-2 text-sm font-medium text-stone transition-transform active:translate-y-px disabled:opacity-50"
         >
           {loading ? <CircleNotch size={15} className="animate-spin" /> : <ArrowRight size={15} weight="bold" />}
           Ask
@@ -117,7 +117,7 @@ function Result({ result, reduce }: { result: GroundResult; reduce: boolean }) {
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={SPRING}
-      className="rounded-lg border bg-surface shadow-card"
+      className="glass rounded-lg"
     >
       <div className="border-b border-hairline p-5">
         <div className="flex items-center justify-between gap-3">
@@ -184,7 +184,7 @@ function Result({ result, reduce }: { result: GroundResult; reduce: boolean }) {
 
 function Skeleton() {
   return (
-    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="rounded-lg border bg-surface p-5 shadow-card">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="glass rounded-lg p-5">
       <div className="h-3 w-16 animate-pulse rounded bg-hairline" />
       <div className="mt-3 h-4 w-full animate-pulse rounded bg-hairline" />
       <div className="mt-2 h-4 w-3/4 animate-pulse rounded bg-hairline" />

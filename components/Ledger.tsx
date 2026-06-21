@@ -94,7 +94,7 @@ export function Ledger() {
         <button
           onClick={runAgent}
           disabled={running}
-          className="inline-flex shrink-0 items-center gap-2 rounded bg-accent px-4 py-2 text-sm font-medium text-white transition-transform active:translate-y-px disabled:opacity-60"
+          className="inline-flex shrink-0 items-center gap-2 rounded bg-accent px-4 py-2 text-sm font-medium text-stone transition-transform active:translate-y-px disabled:opacity-60"
         >
           {running ? (
             <>
@@ -124,7 +124,7 @@ export function Ledger() {
               key={it.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="rounded-lg border bg-surface p-4 shadow-card sm:px-5"
+              className="glass rounded-lg p-4 sm:px-5"
             >
               <div className="flex items-baseline justify-between gap-3">
                 <span className="truncate text-sm text-ink">{it.question}</span>

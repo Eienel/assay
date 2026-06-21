@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { tokens } from '@/lib/tokens';
 import { SiteHeader } from '@/components/SiteHeader';
+import { InkField } from '@/components/InkField';
 import './globals.css';
 
 export const metadata: Metadata = {
@@ -18,7 +19,8 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className="grain min-h-screen antialiased">
+      <body className="min-h-screen antialiased">
+        <InkField />
         <div className="relative z-10">
           <SiteHeader />
           {children}

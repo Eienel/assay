@@ -1,13 +1,12 @@
-// Obol palette. One light theme, one accent. Deliberately cool stone rather
-// than the warm beige/brass/espresso that marks AI-default "premium" pages.
-// The single accent is verdigris, the patina of an aged bronze coin, and it
-// means one thing only: settled / paid.
+// Obol palette. One calm dark theme, one accent. A deep teal-ink ground (like
+// still water at night) so glass and drifting ink read with depth, lit by a
+// single mint-verdigris accent that means one thing: settled / paid.
 export const tokens = {
-  stone: '#F3F4F1', // background, cool pale stone
-  surface: '#FFFFFF', // raised surface
-  hairline: '#E4E5E0', // 1px borders
-  ink: '#181A19', // primary text, cool near-black
-  muted: '#6E726D', // secondary text
-  accent: '#1F7A60', // verdigris: settled / paid / primary action only
-  accentSoft: '#E9F1ED', // a quiet wash of the accent for fills
+  stone: '#0F1514', // base background, deep teal-ink
+  surface: '#161D1B', // raised solid surface (rare; most cards are glass)
+  hairline: '#2A332F', // 1px borders on dark
+  ink: '#ECEFEA', // primary text, off-white
+  muted: '#93A09A', // secondary text, muted green-gray
+  accent: '#3FB68C', // mint verdigris: settled / paid / primary action only
+  accentSoft: 'rgba(63,182,140,0.14)', // quiet wash of the accent
 } as const;
