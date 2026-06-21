@@ -89,8 +89,13 @@ Arc testnet, settled via Circle Gateway, verifier by Gemini.
 - Funder / payer wallet: `0x619184708a654bc5500004485A44dD38B920D480`
 - Source wallets receive per grounding, for example Numismatica
   `0xDB5ABBf92E02440B34EeA343F2aF354a8b55F883`.
-- A live answer split across three sources settled `0.0012 / 0.0015 / 0.0003`
-  USDC, one settlement each, with the unused sources paid nothing.
+- A live answer split across three sources paid `0.0012 / 0.0015 / 0.0003` USDC,
+  with the unused sources paid nothing.
+- Payments land in each source's Circle Gateway balance (gas-free, batched, and
+  withdrawable on-chain), not the EOA. Verified Gateway balances after a few
+  answers: Numismatica `0.006`, The Ledger Ledger `0.0044`, Stablecoin Times
+  `0.0012`. The id shown per payment is a Gateway transfer id, not a block
+  explorer hash.
 
 ## Notes
 

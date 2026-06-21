@@ -124,7 +124,7 @@ function Result({ result, reduce }: { result: GroundResult; reduce: boolean }) {
           <span className="label">Answer</span>
           <span className="text-micro text-muted">
             {result.method === 'gemini' ? 'Gemini verifier' : 'heuristic verifier'}
-            {result.live ? ' · settled on Arc' : ' · simulated'}
+            {result.live ? ' · paid via Circle Gateway' : ' · simulated'}
           </span>
         </div>
         <p className="mt-2 text-lg text-ink">{result.answer}</p>
@@ -158,8 +158,8 @@ function Result({ result, reduce }: { result: GroundResult; reduce: boolean }) {
                 {s.grounded ? (
                   <>
                     <div className="mono text-sm text-accent">{settle?.amountUsdc} USDC</div>
-                    <div className="mono text-micro text-muted">
-                      {(s.weight * 100).toFixed(0)}% · {shortTx(settle?.txId)}
+                    <div className="mono text-micro text-muted" title="Circle Gateway transfer id">
+                      {(s.weight * 100).toFixed(0)}% · gw {shortTx(settle?.txId)}
                     </div>
                   </>
                 ) : (
