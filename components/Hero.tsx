@@ -26,9 +26,11 @@ export function Hero() {
       </div>
 
       {/* A live document of the last few calls, in place of a static logo.
-          Nudged slightly left so it sits closer to the headline. */}
-      <div className="hidden md:block md:-translate-x-6">
-        <RecentCalls />
+          Centered within its column so it sits in the middle of the space. */}
+      <div className="hidden md:flex md:justify-center">
+        <div className="w-full max-w-[380px]">
+          <RecentCalls />
+        </div>
       </div>
     </section>
   );
