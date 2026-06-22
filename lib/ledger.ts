@@ -4,8 +4,10 @@ import type { GroundResult } from './types';
 // + KV_REST_API_TOKEN) it persists across serverless instances; otherwise it
 // falls back to an in-memory store (fine for local and single-instance demos).
 
-const KV_URL = process.env.KV_REST_API_URL;
-const KV_TOKEN = process.env.KV_REST_API_TOKEN;
+// Accept either the Vercel KV names or the Upstash Marketplace names, since the
+// integration may set one or the other.
+const KV_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
+const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
 const KEY = 'obol:ledger';
 const CAP = 200;
 
@@ -62,6 +64,7 @@ export async function snapshot() {
     }
   }
   return {
+    store: KV_URL && KV_TOKEN ? 'kv' : 'memory',
     items: list,
     totals: {
       answers: list.length,
