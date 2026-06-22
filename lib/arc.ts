@@ -72,6 +72,39 @@ export async function payToSource(
   return res.data?.tx;
 }
 
+// A source's earnings: what it has accrued in the Gateway (claimable) and what
+// already sits on-chain in its wallet.
+export async function getEarnings(
+  payTo: string,
+): Promise<{ gateway: string; onchain: string; gatewayMicros: number }> {
+  const g = getGateway();
+  let gatewayMicros = 0n;
+  if (g) {
+    try {
+      gatewayMicros = (await g.getBalances(payTo as Address)).gateway.available;
+    } catch {
+      /* ignore */
+    }
+  }
+  let onchain = 0n;
+  try {
+    const pub = createPublicClient({ chain: arcTestnet, transport: http(RPC) });
+    onchain = (await pub.readContract({
+      address: ARC_USDC as Address,
+      abi: erc20Abi,
+      functionName: 'balanceOf',
+      args: [payTo as Address],
+    })) as bigint;
+  } catch {
+    /* ignore */
+  }
+  return {
+    gateway: formatUnits(gatewayMicros, 6),
+    onchain: formatUnits(onchain, 6),
+    gatewayMicros: Number(gatewayMicros),
+  };
+}
+
 // Materialize a source's earnings on-chain: read what it has accrued in the
 // Gateway, then send that exact amount on-chain from the treasury to its wallet,
 // so the payout is verifiable as a real transaction on ArcScan. (We hold the

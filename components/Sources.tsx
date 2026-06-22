@@ -33,7 +33,9 @@ export async function Sources() {
             <Coin size={30} className="shrink-0" />
             <div className="min-w-0 flex-1">
               <div className="flex items-baseline gap-2">
-                <span className="text-sm font-medium text-ink">{s.name}</span>
+                <a href={`/s/${s.payTo}`} className="wipe text-sm font-medium text-ink hover:text-accent">
+                  {s.name}
+                </a>
                 <span className="mono text-micro text-muted">{s.handle}</span>
                 {s.live && (
                   <span className="inline-flex items-center gap-1 rounded-full border border-hairline px-1.5 text-micro text-accent">

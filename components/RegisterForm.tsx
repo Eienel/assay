@@ -53,11 +53,16 @@ export function RegisterForm() {
           >
             {done.payTo.slice(0, 6)}…{done.payTo.slice(-4)} ↗
           </a>
-          . Settle it on-chain from the sources list any time.
+          .
         </p>
-        <button onClick={() => setDone(null)} className="btn btn-glass mt-4 px-3 py-1.5 text-micro">
-          Register another
-        </button>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <a href={`/s/${done.payTo}`} className="btn btn-accent px-4 py-2">
+            View your earnings page
+          </a>
+          <button onClick={() => setDone(null)} className="btn btn-glass px-3 py-1.5 text-micro">
+            Register another
+          </button>
+        </div>
       </div>
     );
   }

@@ -60,6 +60,21 @@ export async function getLastDeposit(): Promise<string | undefined> {
   return g.__obolDep || process.env.OBOL_FUNDING_TX || undefined;
 }
 
+// Recent answers that paid a given wallet, newest first.
+export async function paymentsTo(payTo: string, limit = 20) {
+  const a = payTo.toLowerCase();
+  const list = await items();
+  const out: { question: string; amountUsdc: string; ts: number; txId?: string }[] = [];
+  for (const it of list) {
+    for (const s of it.settlements) {
+      if (s.payTo.toLowerCase() === a) {
+        out.push({ question: it.question, amountUsdc: s.amountUsdc, ts: it.ts, txId: s.txId });
+      }
+    }
+  }
+  return out.slice(0, limit);
+}
+
 export async function snapshot() {
   const list = await items();
   let micros = 0;
