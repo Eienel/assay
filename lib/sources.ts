@@ -12,6 +12,7 @@ export interface Source {
   payTo: `0x${string}`;
   text: string;
   live?: boolean; // true for sources pulled live from a real RSS publication
+  registered?: boolean; // true for sources a creator claimed with their own wallet
 }
 
 export const SOURCES: Source[] = [

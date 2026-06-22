@@ -4,6 +4,7 @@ import { groundedAnswer } from '@/lib/answer';
 import { attribute } from '@/lib/verifier';
 import { ensureDeposit, getGateway, payToSource } from '@/lib/arc';
 import { record } from '@/lib/ledger';
+import { rateLimit, clientIp } from '@/lib/ratelimit';
 import type { GroundResult, Settlement } from '@/lib/types';
 
 export const runtime = 'nodejs';
@@ -15,6 +16,14 @@ export const maxDuration = 60;
 // sources as real nanopayments on Arc.
 export async function POST(request: Request) {
   try {
+    const limit = await rateLimit(`ground:${clientIp(request)}`, 12, 60);
+    if (!limit.ok) {
+      return NextResponse.json(
+        { error: `Slow down a moment, try again in ${limit.retryAfter}s.` },
+        { status: 429, headers: { 'retry-after': String(limit.retryAfter) } },
+      );
+    }
+
     const { question } = (await request.json()) as { question?: string };
     if (!question || !question.trim()) {
       return NextResponse.json({ error: 'Ask a question.' }, { status: 400 });

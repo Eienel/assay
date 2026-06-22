@@ -2,7 +2,7 @@ import { geminiJson, hasGemini } from './gemini';
 import type { Source } from './sources';
 import type { GroundedSource } from './types';
 
-// Obol's edge: decide which sources an answer was ACTUALLY grounded in, and in
+// Assay's edge: decide which sources an answer was ACTUALLY grounded in, and in
 // what proportion. That proportion is the payout split. A source the answer did
 // not use gets weight 0 and is paid nothing.
 export async function attribute(

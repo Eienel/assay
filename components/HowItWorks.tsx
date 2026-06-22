@@ -6,7 +6,7 @@ const STEPS = [
     n: '1',
     icon: MagnifyingGlass,
     title: 'Retrieve',
-    body: 'A question comes in. Obol pulls the registered sources most relevant to it.',
+    body: 'A question comes in. Assay pulls the registered sources most relevant to it.',
   },
   {
     n: '2',
@@ -34,7 +34,7 @@ export function HowItWorks() {
       <Reveal>
         <h2 className="text-2xl font-semibold tracking-tight text-ink">How it works</h2>
         <p className="mt-3 max-w-prose text-base text-muted">
-          Grounding already happens every time an agent answers. Obol makes it pay the sources it
+          Grounding already happens every time an agent answers. Assay makes it pay the sources it
           used, in proportion, automatically.
         </p>
       </Reveal>

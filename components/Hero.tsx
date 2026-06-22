@@ -12,7 +12,7 @@ export function Hero() {
           Pay the source, per use.
         </h1>
         <p className="mt-4 max-w-prose text-lg text-muted">
-          When an AI answer draws on a source, Obol settles a fraction of a cent to that source.
+          When an AI answer draws on a source, Assay settles a fraction of a cent to that source.
           Split by what the answer actually used, on Arc, in USDC.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-3">

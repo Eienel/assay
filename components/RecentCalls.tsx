@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { Coin } from './Coin';
 import type { GroundResult } from '@/lib/types';
 
-// A small live document in the hero: the last few calls made on Obol, each with
+// A small live document in the hero: the last few calls made on Assay, each with
 // the sources it paid. Reads the shared ledger and updates as answers settle.
 export function RecentCalls() {
   const [items, setItems] = useState<GroundResult[]>([]);
@@ -39,7 +39,7 @@ export function RecentCalls() {
   return (
     <div className="glass ticks rounded-xl p-5">
       <div className="flex items-center justify-between">
-        <span className="label">Last calls on Obol</span>
+        <span className="label">Last calls on Assay</span>
         <span className="inline-flex items-center gap-1.5 text-micro text-accent">
           <span className="h-1.5 w-1.5 rounded-full bg-accent" />
           live

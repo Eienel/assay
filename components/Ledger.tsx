@@ -146,7 +146,7 @@ export function Ledger() {
           ) : (
             <>
               <Play size={14} weight="fill" />
-              Run the research agent
+              Quick sample run
             </>
           )}
         </button>

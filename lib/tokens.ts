@@ -1,4 +1,4 @@
-// Obol palette. One calm dark theme, one accent. A deep teal-ink ground (like
+// Assay palette. One calm dark theme, one accent. A deep teal-ink ground (like
 // still water at night) so glass and drifting ink read with depth, lit by a
 // single mint-verdigris accent that means one thing: settled / paid.
 export const tokens = {

@@ -1,13 +1,9 @@
 import type { GroundResult } from './types';
+import { hasKv, kv } from './kv';
 
-// Durable ledger. When Vercel KV / Upstash Redis is configured (KV_REST_API_URL
-// + KV_REST_API_TOKEN) it persists across serverless instances; otherwise it
-// falls back to an in-memory store (fine for local and single-instance demos).
-
-// Accept either the Vercel KV names or the Upstash Marketplace names, since the
-// integration may set one or the other.
-const KV_URL = process.env.KV_REST_API_URL || process.env.UPSTASH_REDIS_REST_URL;
-const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST_TOKEN;
+// Durable ledger. When Vercel KV / Upstash Redis is configured it persists
+// across serverless instances; otherwise it falls back to an in-memory store
+// (fine for local and single-instance demos).
 const KEY = 'obol:ledger';
 const CAP = 200;
 
@@ -15,19 +11,8 @@ const g = globalThis as unknown as { __obolLedger?: GroundResult[]; __obolDep?: 
 const mem: GroundResult[] = (g.__obolLedger ??= []);
 const DEP_KEY = 'obol:lastDeposit';
 
-async function kv(cmd: unknown[]): Promise<unknown> {
-  const res = await fetch(KV_URL as string, {
-    method: 'POST',
-    headers: { authorization: `Bearer ${KV_TOKEN}`, 'content-type': 'application/json' },
-    body: JSON.stringify(cmd),
-    cache: 'no-store',
-  });
-  if (!res.ok) throw new Error(`KV ${res.status}`);
-  return (await res.json()) as { result: unknown };
-}
-
 export async function record(result: GroundResult): Promise<void> {
-  if (KV_URL && KV_TOKEN) {
+  if (hasKv()) {
     try {
       await kv(['LPUSH', KEY, JSON.stringify(result)]);
       await kv(['LTRIM', KEY, 0, CAP - 1]);
@@ -41,7 +26,7 @@ export async function record(result: GroundResult): Promise<void> {
 }
 
 async function items(): Promise<GroundResult[]> {
-  if (KV_URL && KV_TOKEN) {
+  if (hasKv()) {
     try {
       const out = (await kv(['LRANGE', KEY, 0, CAP - 1])) as { result: string[] };
       return (out.result ?? []).map((s) => JSON.parse(s) as GroundResult);
@@ -54,7 +39,7 @@ async function items(): Promise<GroundResult[]> {
 
 export async function setLastDeposit(tx: string): Promise<void> {
   g.__obolDep = tx;
-  if (KV_URL && KV_TOKEN) {
+  if (hasKv()) {
     try {
       await kv(['SET', DEP_KEY, tx]);
     } catch {
@@ -64,7 +49,7 @@ export async function setLastDeposit(tx: string): Promise<void> {
 }
 
 export async function getLastDeposit(): Promise<string | undefined> {
-  if (KV_URL && KV_TOKEN) {
+  if (hasKv()) {
     try {
       const out = (await kv(['GET', DEP_KEY])) as { result: string | null };
       if (out.result) return out.result;
@@ -88,7 +73,7 @@ export async function snapshot() {
     }
   }
   return {
-    store: KV_URL && KV_TOKEN ? 'kv' : 'memory',
+    store: hasKv() ? 'kv' : 'memory',
     lastDepositTx: await getLastDeposit(),
     items: list,
     totals: {

@@ -12,6 +12,9 @@ export function SiteHeader() {
           <a href="#ask" className="wipe hover:text-ink">
             Try it
           </a>
+          <a href="#agent" className="wipe hover:text-ink">
+            Agent
+          </a>
           <a href="#how" className="wipe hover:text-ink">
             How it works
           </a>

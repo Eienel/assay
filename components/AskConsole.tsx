@@ -51,7 +51,7 @@ export function AskConsole() {
     <section id="ask" className="mx-auto max-w-shell scroll-mt-16 px-5 py-16 sm:px-8">
       <h2 className="text-2xl font-semibold tracking-tight text-ink">Ask, and watch a source get paid</h2>
       <p className="mt-3 max-w-prose text-base text-muted">
-        Ask a question. Obol answers from its registered sources, verifies which ones the answer
+        Ask a question. Assay answers from its registered sources, verifies which ones the answer
         actually used, and settles a coin to each, live on Arc.
       </p>
 

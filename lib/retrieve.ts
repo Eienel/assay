@@ -1,5 +1,6 @@
 import { SOURCES, type Source } from './sources';
 import { getLiveSources } from './rss';
+import { listRegistered } from './registry';
 
 const STOP = new Set(
   'the a an and or of to in on for with is are was were be by as at it its this that from into what when who how why does did do which'.split(
@@ -16,8 +17,11 @@ const terms = (s: string) =>
 // Cheap, legible retrieval over the curated sources plus any live RSS
 // publications, ranked by term overlap with the question.
 export async function retrieve(question: string, k = 4): Promise<Source[]> {
-  const live = await getLiveSources().catch(() => []);
-  const pool = [...SOURCES, ...live];
+  const [live, registered] = await Promise.all([
+    getLiveSources().catch(() => []),
+    listRegistered().catch(() => []),
+  ]);
+  const pool = [...SOURCES, ...registered, ...live];
   const q = new Set(terms(question));
   const scored = pool.map((s) => {
     const st = new Set(terms(s.text + ' ' + s.name));

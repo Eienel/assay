@@ -2,6 +2,7 @@ import { BatchFacilitatorClient } from '@circle-fin/x402-batching/server';
 import { buildRequirements } from '@/lib/arc';
 import { sourceById } from '@/lib/sources';
 import { walletForId } from '@/lib/rss';
+import { getRegisteredById } from '@/lib/registry';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -17,7 +18,7 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const id = url.searchParams.get('id') ?? '';
   const micros = parseInt(url.searchParams.get('micros') ?? '0', 10);
-  const source = sourceById(id);
+  const source = sourceById(id) ?? (await getRegisteredById(id));
   const payTo = source?.payTo ?? walletForId(id);
   if (!id || micros <= 0) {
     return new Response(JSON.stringify({ error: 'unknown source' }), { status: 404 });

@@ -1,15 +1,20 @@
 import { Coin } from './Coin';
 import { Reveal } from './Reveal';
 import { SettleButton } from './SettleButton';
+import { RegisterForm } from './RegisterForm';
 import { SOURCES } from '@/lib/sources';
 import { getLiveSources } from '@/lib/rss';
+import { listRegistered } from '@/lib/registry';
 import { addressUrl } from '@/lib/explorer';
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
 export async function Sources() {
-  const live = await getLiveSources().catch(() => []);
-  const all = [...SOURCES, ...live];
+  const [live, registered] = await Promise.all([
+    getLiveSources().catch(() => []),
+    listRegistered().catch(() => []),
+  ]);
+  const all = [...registered, ...SOURCES, ...live];
 
   return (
     <section id="sources" className="mx-auto max-w-shell scroll-mt-16 px-5 py-16 sm:px-8">
@@ -36,6 +41,11 @@ export async function Sources() {
                     live
                   </span>
                 )}
+                {s.registered && (
+                  <span className="rounded-full border border-accent/40 px-1.5 text-micro text-accent">
+                    claimed
+                  </span>
+                )}
               </div>
               <p className="mt-0.5 line-clamp-1 text-sm text-muted">{s.text}</p>
             </div>
@@ -54,6 +64,17 @@ export async function Sources() {
           </li>
         ))}
       </ul>
+
+      <Reveal className="mt-10">
+        <h3 className="text-lg font-medium text-ink">Are you a source? Claim your wallet.</h3>
+        <p className="mt-2 max-w-prose text-sm text-muted">
+          Register what you publish and a wallet you control. When an answer is grounded in your
+          content, you get paid, in real test-USDC on Arc, verifiable on ArcScan.
+        </p>
+        <div className="mt-4">
+          <RegisterForm />
+        </div>
+      </Reveal>
     </section>
   );
 }

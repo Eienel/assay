@@ -23,7 +23,7 @@ export function Coin({
       viewBox="0 0 48 48"
       fill="none"
       role="img"
-      aria-label="Obol"
+      aria-label="Assay"
       className={className}
       style={paid ? { filter: 'drop-shadow(0 0 5px rgba(63,182,140,0.45))' } : undefined}
     >
@@ -51,7 +51,7 @@ export function Wordmark() {
   return (
     <span className="inline-flex items-center gap-2.5">
       <Coin size={26} />
-      <span className="text-base font-semibold tracking-tight text-ink">Obol</span>
+      <span className="text-base font-semibold tracking-tight text-ink">Assay</span>
     </span>
   );
 }

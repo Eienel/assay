@@ -1,20 +1,20 @@
-# Obol
+# Assay
 
 Pay the source, per use.
 
-When an AI answer draws on a source, Obol settles a fraction of a cent to that
+When an AI answer draws on a source, Assay settles a fraction of a cent to that
 source, split by what the answer actually used, on Arc, in USDC. The obol was
 the small coin of the ancient world; here it is the coin an answer drops to
 every source it stands on.
 
-Live demo: https://useobol.vercel.app
+Live demo: https://useassay.vercel.app
 
 ## The gap it closes
 
 AI answers are grounded in sources, and those sources are read for free. The
 floor on payments (roughly thirty cents after fees) meant a citation was never
 worth settling, so nobody did. Arc removes the floor: USDC gas, sub-second
-finality, payments as small as $0.000001. Obol uses that to make grounding pay.
+finality, payments as small as $0.000001. Assay uses that to make grounding pay.
 
 The hard part is not the rail. It is deciding **which** sources an answer was
 actually grounded in, and by how much. That is the verifier, and it is the
@@ -22,7 +22,7 @@ product.
 
 ## How it works
 
-1. **Retrieve.** A question comes in; Obol pulls the registered sources most
+1. **Retrieve.** A question comes in; Assay pulls the registered sources most
    relevant to it.
 2. **Answer.** A model answers using only those sources and reports which it
    used.
