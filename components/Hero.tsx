@@ -1,4 +1,4 @@
-import { Coin } from './Coin';
+import { RecentCalls } from './RecentCalls';
 
 export function Hero() {
   return (
@@ -25,15 +25,9 @@ export function Hero() {
         </div>
       </div>
 
-      {/* A small glass chip holding the coin, not a giant logo. */}
-      <div className="hidden justify-end md:flex">
-        <div className="glass ticks float flex items-center gap-3 rounded-xl px-5 py-4">
-          <Coin size={64} />
-          <div className="leading-tight">
-            <div className="mono text-base text-ink">0.000001</div>
-            <div className="label">smallest coin</div>
-          </div>
-        </div>
+      {/* A live document of the last few calls, in place of a static logo. */}
+      <div className="hidden md:block">
+        <RecentCalls />
       </div>
     </section>
   );

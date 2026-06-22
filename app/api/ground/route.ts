@@ -20,16 +20,29 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Ask a question.' }, { status: 400 });
     }
 
-    const toll = parseFloat(process.env.OBOL_TOLL_USDC ?? '0.003');
+    // Price per citation, not a flat fee. Each source the answer genuinely used
+    // earns a base rate, scaled by how much it contributed. So an answer that
+    // leans on more sources, or leans harder on one, pays more. Capped so a
+    // single answer can never drain the funder.
+    const rate = parseFloat(process.env.OBOL_RATE_PER_CITATION ?? process.env.OBOL_TOLL_USDC ?? '0.0015');
+    const maxToll = parseFloat(process.env.OBOL_MAX_TOLL_USDC ?? '0.02');
+
     const retrieved = await retrieve(question, 4);
     const { answer } = await groundedAnswer(question, retrieved);
     const { sources, method } = await attribute(question, answer, retrieved);
 
     const byId = new Map(retrieved.map((r) => [r.id, r]));
     const grounded = sources.filter((s) => s.grounded && s.weight > 0);
+    const n = grounded.length;
+    const cap = Math.round(maxToll * 1e6);
+    let running = 0;
     const settlements: Settlement[] = grounded.map((s) => {
       const src = byId.get(s.id)!;
-      const micros = Math.max(1, Math.round(toll * 1e6 * s.weight));
+      // weight sums to 1, so weight * n averages to 1 per source: total scales
+      // with the number of grounded sources, each share set by contribution.
+      let micros = Math.max(1, Math.round(rate * 1e6 * s.weight * n));
+      micros = Math.min(micros, Math.max(1, cap - running));
+      running += micros;
       return {
         sourceId: s.id,
         name: s.name,
@@ -62,7 +75,7 @@ export async function POST(request: Request) {
       answer,
       sources,
       settlements,
-      tollUsdc: toll,
+      tollUsdc: rate,
       settledMicros: settlements.reduce((s, x) => s + x.micros, 0),
       method,
       live,

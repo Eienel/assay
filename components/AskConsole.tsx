@@ -169,10 +169,10 @@ function Result({ result, reduce }: { result: GroundResult; reduce: boolean }) {
 
       <div className="flex items-center justify-between border-t border-hairline px-5 py-3 text-micro text-muted">
         <span>
-          toll {result.tollUsdc.toFixed(3)} USDC, split across {result.settlements.length}{' '}
-          {result.settlements.length === 1 ? 'source' : 'sources'}
+          {result.tollUsdc.toFixed(4)} USDC per citation, priced by contribution across{' '}
+          {result.settlements.length} {result.settlements.length === 1 ? 'source' : 'sources'}
         </span>
-        <span className="mono">{(result.settledMicros / 1e6).toFixed(6)} USDC paid</span>
+        <span className="mono text-accent">{(result.settledMicros / 1e6).toFixed(6)} USDC paid</span>
       </div>
     </motion.div>
   );

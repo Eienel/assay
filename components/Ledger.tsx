@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Play, CircleNotch } from '@phosphor-icons/react';
+import { Play, CircleNotch, MagnifyingGlass } from '@phosphor-icons/react';
 import { Coin } from './Coin';
 import type { GroundResult } from '@/lib/types';
 
@@ -36,6 +36,8 @@ export function Ledger() {
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
   const [freshId, setFreshId] = useState<string | null>(null);
+  const [query, setQuery] = useState('');
+  const [visible, setVisible] = useState(6);
   const runningRef = useRef(false);
   const freshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -101,6 +103,17 @@ export function Ledger() {
   }
 
   const t = snap?.totals;
+  const items = snap?.items ?? [];
+  const q = query.trim().toLowerCase();
+  const filtered = q
+    ? items.filter(
+        (it) =>
+          it.question.toLowerCase().includes(q) ||
+          it.settlements.some((s) => s.handle.toLowerCase().includes(q)),
+      )
+    : items;
+  const shown = filtered.slice(0, visible);
+
   return (
     <section id="ledger" className="mx-auto max-w-shell scroll-mt-16 px-5 py-16 sm:px-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
@@ -133,9 +146,29 @@ export function Ledger() {
         <Stat value={<CountUp value={t?.sourcesPaid ?? 0} />} label="sources paid" />
       </div>
 
-      <ul className="mt-6 space-y-2">
-        {snap?.items.length ? (
-          snap.items.slice(0, 8).map((it) => (
+      {items.length > 0 && (
+        <label className="glass mt-6 flex items-center gap-2 rounded-lg px-3 py-2">
+          <MagnifyingGlass size={15} className="text-muted" />
+          <input
+            value={query}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              setVisible(6);
+            }}
+            placeholder="Search the ledger by question or source..."
+            className="min-w-0 flex-1 bg-transparent text-sm text-ink outline-none placeholder:text-muted"
+          />
+          {query && (
+            <span className="mono shrink-0 text-micro text-muted">
+              {filtered.length} {filtered.length === 1 ? 'match' : 'matches'}
+            </span>
+          )}
+        </label>
+      )}
+
+      <ul className="mt-3 space-y-2">
+        {shown.length ? (
+          shown.map((it) => (
             <motion.li
               key={it.id}
               initial={{ opacity: 0, y: 8 }}
@@ -160,10 +193,23 @@ export function Ledger() {
           ))
         ) : (
           <li className="rounded-lg border border-dashed border-hairline p-8 text-center text-sm text-muted">
-            No tolls yet. Ask a question, or run the agent, and the first coins will land here.
+            {items.length
+              ? 'No entries match your search.'
+              : 'No tolls yet. Ask a question, or run the agent, and the first coins will land here.'}
           </li>
         )}
       </ul>
+
+      {filtered.length > visible && (
+        <div className="mt-4 flex items-center justify-center gap-3">
+          <button onClick={() => setVisible((v) => v + 8)} className="btn btn-glass px-4 py-2">
+            View more
+          </button>
+          <span className="mono text-micro text-muted">
+            showing {shown.length} of {filtered.length}
+          </span>
+        </div>
+      )}
     </section>
   );
 }
