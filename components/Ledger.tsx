@@ -4,6 +4,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, CircleNotch, MagnifyingGlass } from '@phosphor-icons/react';
 import { Coin } from './Coin';
+import { addressUrl } from '@/lib/explorer';
 import type { GroundResult } from '@/lib/types';
 
 interface Snapshot {
@@ -181,11 +182,18 @@ export function Ledger() {
               </div>
               <div className="mt-2.5 flex flex-wrap items-center gap-x-4 gap-y-2">
                 {it.settlements.map((s) => (
-                  <span key={s.sourceId} className="inline-flex items-center gap-1.5">
+                  <a
+                    key={s.sourceId}
+                    href={addressUrl(s.payTo)}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="inline-flex items-center gap-1.5 hover:opacity-80"
+                    title="View recipient wallet on ArcScan"
+                  >
                     <Coin size={18} paid />
                     <span className="mono text-micro text-muted">{s.handle}</span>
                     <span className="mono text-micro text-accent">{s.amountUsdc}</span>
-                  </span>
+                  </a>
                 ))}
                 {!it.settlements.length && <span className="text-micro text-muted">no source paid</span>}
               </div>

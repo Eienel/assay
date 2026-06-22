@@ -27,7 +27,7 @@ export function Hero() {
 
       {/* A live document of the last few calls, in place of a static logo.
           Centered within its column so it sits in the middle of the space. */}
-      <div className="hidden md:flex md:justify-center">
+      <div className="hidden md:flex md:justify-center md:translate-x-8">
         <div className="w-full max-w-[380px]">
           <RecentCalls />
         </div>

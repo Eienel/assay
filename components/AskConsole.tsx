@@ -2,8 +2,9 @@
 
 import { useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { ArrowRight, CircleNotch } from '@phosphor-icons/react';
+import { ArrowRight, CircleNotch, ArrowUpRight } from '@phosphor-icons/react';
 import { Coin } from './Coin';
+import { addressUrl } from '@/lib/explorer';
 import { SPRING } from '@/lib/motion';
 import type { GroundResult } from '@/lib/types';
 
@@ -153,7 +154,19 @@ function Result({ result, reduce }: { result: GroundResult; reduce: boolean }) {
               <div className="shrink-0 text-right">
                 {s.grounded ? (
                   <>
-                    <div className="mono text-sm text-accent">{settle?.amountUsdc} USDC</div>
+                    {settle?.payTo ? (
+                      <a
+                        href={addressUrl(settle.payTo)}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="mono inline-flex items-center gap-1 text-sm text-accent hover:underline"
+                        title="View recipient wallet on ArcScan"
+                      >
+                        {settle.amountUsdc} USDC <ArrowUpRight size={11} weight="bold" />
+                      </a>
+                    ) : (
+                      <div className="mono text-sm text-accent">{settle?.amountUsdc} USDC</div>
+                    )}
                     <div className="mono text-micro text-muted" title="Circle Gateway transfer id">
                       {(s.weight * 100).toFixed(0)}% · gw {shortTx(settle?.txId)}
                     </div>

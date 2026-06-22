@@ -2,6 +2,7 @@ import { Coin } from './Coin';
 import { Reveal } from './Reveal';
 import { SOURCES } from '@/lib/sources';
 import { getLiveSources } from '@/lib/rss';
+import { addressUrl } from '@/lib/explorer';
 
 const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
@@ -37,7 +38,15 @@ export async function Sources() {
               </div>
               <p className="mt-0.5 line-clamp-1 text-sm text-muted">{s.text}</p>
             </div>
-            <span className="mono hidden shrink-0 text-micro text-muted sm:block">{short(s.payTo)}</span>
+            <a
+              href={addressUrl(s.payTo)}
+              target="_blank"
+              rel="noreferrer"
+              className="mono hidden shrink-0 text-micro text-muted hover:text-accent sm:block"
+              title="View wallet on ArcScan"
+            >
+              {short(s.payTo)} ↗
+            </a>
           </li>
         ))}
       </ul>
