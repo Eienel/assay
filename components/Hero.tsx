@@ -25,8 +25,9 @@ export function Hero() {
         </div>
       </div>
 
-      {/* A live document of the last few calls, in place of a static logo. */}
-      <div className="hidden md:block">
+      {/* A live document of the last few calls, in place of a static logo.
+          Nudged slightly left so it sits closer to the headline. */}
+      <div className="hidden md:block md:-translate-x-6">
         <RecentCalls />
       </div>
     </section>
