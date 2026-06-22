@@ -25,6 +25,7 @@ export function Coin({
       role="img"
       aria-label="Obol"
       className={className}
+      style={paid ? { filter: 'drop-shadow(0 0 5px rgba(63,182,140,0.45))' } : undefined}
     >
       {paid && <circle cx="24" cy="24" r="22.5" fill="var(--accent-soft)" />}
       <circle cx="24" cy="24" r="22.5" stroke={stroke} strokeWidth="1.4" />

@@ -35,7 +35,17 @@ export function Ledger() {
   const [snap, setSnap] = useState<Snapshot | null>(null);
   const [running, setRunning] = useState(false);
   const [progress, setProgress] = useState({ done: 0, total: 0 });
+  const [freshId, setFreshId] = useState<string | null>(null);
   const runningRef = useRef(false);
+  const freshTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Fold in a new result and flag it so its row glows once as it lands.
+  const addFresh = useCallback((r: GroundResult) => {
+    setSnap((prev) => merge(prev, r));
+    setFreshId(r.id);
+    if (freshTimer.current) clearTimeout(freshTimer.current);
+    freshTimer.current = setTimeout(() => setFreshId(null), 1800);
+  }, []);
 
   const load = useCallback(async () => {
     try {
@@ -50,7 +60,7 @@ export function Ledger() {
     load();
     const onSettled = (e: Event) => {
       const detail = (e as CustomEvent<GroundResult>).detail;
-      if (detail) setSnap((prev) => merge(prev, detail));
+      if (detail) addFresh(detail);
       else load();
     };
     window.addEventListener('obol:settled', onSettled);
@@ -59,7 +69,7 @@ export function Ledger() {
       window.removeEventListener('obol:settled', onSettled);
       clearInterval(t);
     };
-  }, [load]);
+  }, [load, addFresh]);
 
   async function runAgent() {
     if (runningRef.current) return;
@@ -78,7 +88,7 @@ export function Ledger() {
           // Show the result immediately, so coins land without waiting on the
           // (possibly different) ledger instance.
           const r = (await res.json()) as GroundResult;
-          setSnap((prev) => merge(prev, r));
+          addFresh(r);
         }
       } catch {
         /* keep going */
@@ -117,7 +127,7 @@ export function Ledger() {
       </div>
 
       <div className="mt-7 flex flex-wrap items-end gap-x-10 gap-y-4 border-y border-hairline py-5">
-        <Stat value={<CountUp value={Number(t?.usdc ?? 0)} decimals={6} suffix=" USDC" />} label="paid to sources" />
+        <Stat value={<CountUp value={Number(t?.usdc ?? 0)} decimals={6} suffix=" USDC" />} label="paid to sources" accent />
         <Stat value={<CountUp value={t?.citations ?? 0} />} label="citations settled" />
         <Stat value={<CountUp value={t?.answers ?? 0} />} label="answers" />
         <Stat value={<CountUp value={t?.sourcesPaid ?? 0} />} label="sources paid" />
@@ -130,7 +140,7 @@ export function Ledger() {
               key={it.id}
               initial={{ opacity: 0, y: 8 }}
               animate={{ opacity: 1, y: 0 }}
-              className="glass ticks rounded-lg p-4 sm:px-5"
+              className={`glass ticks rounded-lg p-4 sm:px-5${it.id === freshId ? ' glow-fresh' : ''}`}
             >
               <div className="flex items-baseline justify-between gap-3">
                 <span className="truncate text-sm text-ink">{it.question}</span>
@@ -188,10 +198,10 @@ function merge(prev: Snapshot | null, r: GroundResult): Snapshot {
   };
 }
 
-function Stat({ value, label }: { value: React.ReactNode; label: string }) {
+function Stat({ value, label, accent }: { value: React.ReactNode; label: string; accent?: boolean }) {
   return (
     <div>
-      <div className="mono text-2xl tracking-tight text-ink">{value}</div>
+      <div className={`mono text-2xl tracking-tight ${accent ? 'text-accent' : 'text-ink'}`}>{value}</div>
       <div className="label mt-1">{label}</div>
     </div>
   );

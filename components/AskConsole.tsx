@@ -113,7 +113,7 @@ function Result({ result, reduce }: { result: GroundResult; reduce: boolean }) {
       initial={reduce ? { opacity: 0 } : { opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={SPRING}
-      className="glass ticks rounded-lg"
+      className="glass ticks glow-fresh rounded-lg"
     >
       <div className="border-b border-hairline p-5">
         <div className="flex items-center justify-between gap-3">
