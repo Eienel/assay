@@ -1,10 +1,22 @@
 import 'server-only';
 import { GatewayClient } from '@circle-fin/x402-batching/client';
+import {
+  createWalletClient,
+  createPublicClient,
+  http,
+  erc20Abi,
+  formatUnits,
+  type Address,
+} from 'viem';
+import { arcTestnet } from 'viem/chains';
+import { privateKeyToAccount } from 'viem/accounts';
+import { setLastDeposit } from './ledger';
 
 // Arc testnet, from the Circle x402-batching SDK.
 export const ARC_NETWORK = 'eip155:5042002';
 export const ARC_USDC = '0x3600000000000000000000000000000000000000';
 export const GATEWAY_WALLET = '0x0077777d7EBA4688BDeF3E311b846F25870A19B9';
+const RPC = 'https://rpc.testnet.arc.network';
 
 export function buildRequirements(micros: number, payTo: string) {
   return {
@@ -35,7 +47,8 @@ export async function ensureDeposit(neededMicros: number): Promise<void> {
   if (!g) throw new Error('No funder key');
   const bal = await g.getBalances();
   if (bal.gateway.available >= BigInt(neededMicros)) return;
-  await g.deposit('0.05');
+  const dep = await g.deposit('0.05');
+  await setLastDeposit(dep.depositTxHash); // real on-chain funding tx
   for (let i = 0; i < 15; i++) {
     const b = await g.getBalances();
     if (b.gateway.available >= BigInt(neededMicros)) return;
@@ -57,4 +70,34 @@ export async function payToSource(
   const url = `${baseUrl}/api/source?id=${encodeURIComponent(id)}&payTo=${payTo}&micros=${micros}`;
   const res = (await g.pay(url, { method: 'GET' })) as { data?: { tx?: string } };
   return res.data?.tx;
+}
+
+// Materialize a source's earnings on-chain: read what it has accrued in the
+// Gateway, then send that exact amount on-chain from the treasury to its wallet,
+// so the payout is verifiable as a real transaction on ArcScan. (We hold the
+// treasury key, not the sources', and a Gateway withdrawal carries a large fee,
+// so this is a direct on-chain transfer of the earned amount.)
+export async function settleEarningsOnChain(
+  payTo: string,
+): Promise<{ txHash: string | null; amount: string }> {
+  const g = getGateway();
+  const key = process.env.FUNDER_PRIVATE_KEY as `0x${string}` | undefined;
+  if (!g || !key) throw new Error('No funder key');
+
+  const earned = (await g.getBalances(payTo as Address)).gateway.available;
+  if (earned <= 0n) return { txHash: null, amount: '0' };
+  const cap = 50000n; // 0.05 USDC safety cap per click
+  const micros = earned > cap ? cap : earned;
+
+  const account = privateKeyToAccount(key);
+  const wallet = createWalletClient({ account, chain: arcTestnet, transport: http(RPC) });
+  const pub = createPublicClient({ chain: arcTestnet, transport: http(RPC) });
+  const hash = await wallet.writeContract({
+    address: ARC_USDC as Address,
+    abi: erc20Abi,
+    functionName: 'transfer',
+    args: [payTo as Address, micros],
+  });
+  await pub.waitForTransactionReceipt({ hash });
+  return { txHash: hash, amount: formatUnits(micros, 6) };
 }

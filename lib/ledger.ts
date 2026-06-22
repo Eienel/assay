@@ -11,8 +11,9 @@ const KV_TOKEN = process.env.KV_REST_API_TOKEN || process.env.UPSTASH_REDIS_REST
 const KEY = 'obol:ledger';
 const CAP = 200;
 
-const g = globalThis as unknown as { __obolLedger?: GroundResult[] };
+const g = globalThis as unknown as { __obolLedger?: GroundResult[]; __obolDep?: string };
 const mem: GroundResult[] = (g.__obolLedger ??= []);
+const DEP_KEY = 'obol:lastDeposit';
 
 async function kv(cmd: unknown[]): Promise<unknown> {
   const res = await fetch(KV_URL as string, {
@@ -51,6 +52,29 @@ async function items(): Promise<GroundResult[]> {
   return mem;
 }
 
+export async function setLastDeposit(tx: string): Promise<void> {
+  g.__obolDep = tx;
+  if (KV_URL && KV_TOKEN) {
+    try {
+      await kv(['SET', DEP_KEY, tx]);
+    } catch {
+      /* ignore */
+    }
+  }
+}
+
+export async function getLastDeposit(): Promise<string | undefined> {
+  if (KV_URL && KV_TOKEN) {
+    try {
+      const out = (await kv(['GET', DEP_KEY])) as { result: string | null };
+      if (out.result) return out.result;
+    } catch {
+      /* ignore */
+    }
+  }
+  return g.__obolDep || process.env.OBOL_FUNDING_TX || undefined;
+}
+
 export async function snapshot() {
   const list = await items();
   let micros = 0;
@@ -65,6 +89,7 @@ export async function snapshot() {
   }
   return {
     store: KV_URL && KV_TOKEN ? 'kv' : 'memory',
+    lastDepositTx: await getLastDeposit(),
     items: list,
     totals: {
       answers: list.length,

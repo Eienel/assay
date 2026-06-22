@@ -1,5 +1,6 @@
 import { Coin } from './Coin';
 import { Reveal } from './Reveal';
+import { SettleButton } from './SettleButton';
 import { SOURCES } from '@/lib/sources';
 import { getLiveSources } from '@/lib/rss';
 import { addressUrl } from '@/lib/explorer';
@@ -38,15 +39,18 @@ export async function Sources() {
               </div>
               <p className="mt-0.5 line-clamp-1 text-sm text-muted">{s.text}</p>
             </div>
-            <a
-              href={addressUrl(s.payTo)}
-              target="_blank"
-              rel="noreferrer"
-              className="mono hidden shrink-0 text-micro text-muted hover:text-accent sm:block"
-              title="View wallet on ArcScan"
-            >
-              {short(s.payTo)} ↗
-            </a>
+            <div className="hidden shrink-0 items-center gap-3 sm:flex">
+              <a
+                href={addressUrl(s.payTo)}
+                target="_blank"
+                rel="noreferrer"
+                className="mono text-micro text-muted hover:text-accent"
+                title="View wallet on ArcScan"
+              >
+                {short(s.payTo)} ↗
+              </a>
+              <SettleButton payTo={s.payTo} />
+            </div>
           </li>
         ))}
       </ul>

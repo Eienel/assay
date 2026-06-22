@@ -4,11 +4,12 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Play, CircleNotch, MagnifyingGlass } from '@phosphor-icons/react';
 import { Coin } from './Coin';
-import { addressUrl } from '@/lib/explorer';
+import { addressUrl, txUrl } from '@/lib/explorer';
 import type { GroundResult } from '@/lib/types';
 
 interface Snapshot {
   items: GroundResult[];
+  lastDepositTx?: string;
   totals: { answers: number; citations: number; micros: number; usdc: string; sourcesPaid: number };
 }
 
@@ -124,6 +125,17 @@ export function Ledger() {
             Every answer drops coins to the sources it used. This is the running record, settled on
             Arc.
           </p>
+          {snap?.lastDepositTx && (
+            <a
+              href={txUrl(snap.lastDepositTx)}
+              target="_blank"
+              rel="noreferrer"
+              className="mono mt-2 inline-flex items-center gap-1 text-micro text-accent hover:underline"
+              title="The treasury's most recent on-chain Gateway deposit"
+            >
+              treasury funded on-chain ↗
+            </a>
+          )}
         </div>
         <button onClick={runAgent} disabled={running} className="btn btn-glass-accent px-4 py-2 disabled:opacity-60">
           {running ? (
