@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import { RecentCalls } from './RecentCalls';
 
 export function Hero() {
@@ -16,22 +17,21 @@ export function Hero() {
           Split by what the answer actually used, on Arc, in USDC.
         </p>
         <div className="mt-7 flex flex-wrap items-center gap-3">
-          <a href="#ask" className="btn btn-accent px-5 py-2.5">
+          <Link href="/try" className="btn btn-accent px-5 py-2.5">
             Try it live
-          </a>
+          </Link>
           <a href="#how" className="btn btn-glass px-5 py-2.5">
             How it works
           </a>
         </div>
       </div>
 
-      {/* A live document of the last few calls, in place of a static logo.
-          Centered within its column so it sits in the middle of the space. */}
-      <div className="hidden md:flex md:justify-center md:translate-x-8">
+      {/* A live document of the last few calls, linking into the app. */}
+      <Link href="/try" className="hidden md:flex md:justify-center md:translate-x-8">
         <div className="w-full max-w-[380px]">
           <RecentCalls />
         </div>
-      </div>
+      </Link>
     </section>
   );
 }

@@ -67,7 +67,8 @@ export async function Sources() {
         ))}
       </ul>
 
-      <Reveal className="mt-10">
+      <Reveal className="mt-10 scroll-mt-16" >
+        <div id="register" className="scroll-mt-16" />
         <h3 className="text-lg font-medium text-ink">Are you a source? Claim your wallet.</h3>
         <p className="mt-2 max-w-prose text-sm text-muted">
           Register what you publish and a wallet you control. When an answer is grounded in your

@@ -46,13 +46,16 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 Circle Gateway, with USDC. Testnet.
               </p>
               <nav className="flex flex-wrap gap-x-5 gap-y-2 text-micro text-muted">
-                <a href="#how" className="wipe hover:text-ink">
+                <a href="/try" className="wipe hover:text-ink">
+                  Try it
+                </a>
+                <a href="/sources" className="wipe hover:text-ink">
+                  Sources
+                </a>
+                <a href="/#how" className="wipe hover:text-ink">
                   How it works
                 </a>
-                <a href="#sources" className="wipe hover:text-ink">
-                  Become a source
-                </a>
-                <a href="#faq" className="wipe hover:text-ink">
+                <a href="/#faq" className="wipe hover:text-ink">
                   Questions
                 </a>
               </nav>
