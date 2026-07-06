@@ -71,13 +71,20 @@ async function plan(goal: string): Promise<{ strategy: string; questions: string
     }
   }
   const g = goal.trim().replace(/\?+$/, '');
+  // Strip a leading interrogative so a goal phrased as a question ("How do X
+  // and Y fit together") becomes a topic ("X and Y fit together") that reads
+  // naturally inside the follow-up templates below.
+  const topic = g.replace(
+    /^(how|what|why|when|who|which)\s+(do|does|did|is|are|was|were|can|could|should|would)?\s*/i,
+    '',
+  );
   return {
     strategy: 'Break the goal into direct questions and pay each source consulted.',
     questions: [
       `${g}?`,
-      `What background helps explain ${g}?`,
-      `What are the key parts of ${g}?`,
-      `Why does ${g} matter?`,
+      `What background helps explain ${topic}?`,
+      `What are the key parts of ${topic}?`,
+      `Why does ${topic} matter?`,
     ],
   };
 }

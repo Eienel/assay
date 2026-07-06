@@ -8,6 +8,7 @@ import { Wordmark } from './Coin';
 
 const LINKS: [string, string][] = [
   ['/try', 'Try it'],
+  ['/trust', 'Bonds'],
   ['/sources', 'Sources'],
   ['/#how', 'How it works'],
 ];
