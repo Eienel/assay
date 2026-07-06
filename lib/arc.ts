@@ -105,6 +105,34 @@ export async function getEarnings(
   };
 }
 
+// The treasury's own address, derived from the funder key. It is the escrow that
+// holds broker bonds and the counterparty a slashed bond returns to.
+export function treasuryAddress(): string | null {
+  const key = process.env.FUNDER_PRIVATE_KEY as `0x${string}` | undefined;
+  if (!key) return null;
+  return privateKeyToAccount(key).address;
+}
+
+// A raw on-chain USDC transfer from the treasury to any address, verifiable on
+// ArcScan. Used to settle bond slashes and vouching rewards. Returns null when
+// no funder key is configured, so callers fall back to a recorded-only
+// (simulated) settlement for local and keyless demos.
+export async function sendOnChain(to: string, micros: number): Promise<string | null> {
+  const key = process.env.FUNDER_PRIVATE_KEY as `0x${string}` | undefined;
+  if (!key || micros <= 0) return null;
+  const account = privateKeyToAccount(key);
+  const wallet = createWalletClient({ account, chain: arcTestnet, transport: http(RPC) });
+  const pub = createPublicClient({ chain: arcTestnet, transport: http(RPC) });
+  const hash = await wallet.writeContract({
+    address: ARC_USDC as Address,
+    abi: erc20Abi,
+    functionName: 'transfer',
+    args: [to as Address, BigInt(micros)],
+  });
+  await pub.waitForTransactionReceipt({ hash });
+  return hash;
+}
+
 // Materialize a source's earnings on-chain: read what it has accrued in the
 // Gateway, then send that exact amount on-chain from the treasury to its wallet,
 // so the payout is verifiable as a real transaction on ArcScan. (We hold the

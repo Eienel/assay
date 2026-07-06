@@ -25,7 +25,15 @@ actually grounded in, and by how much. That verifier is the product.
   paid nothing.
 - **Dispatch a research agent.** Give it a goal and a budget. It plans its own
   questions, pays each source it draws on, tracks spend against the budget, and
-  stops when the goal is covered or the budget runs out.
+  stops when the goal is covered or the budget runs out. It is a real
+  decide-act-observe-reflect loop, streamed live: it forms new follow-up
+  questions to close the gaps it finds, declines to pay a source whose grounding
+  is too weak, and stops early when the goal is covered, leaving budget unspent.
+- **Post a reputation bond** at `/trust`. A broker agent stakes a USDC bond on a
+  source's grounding quality. The same verifier judges each answer: a broker
+  whose source delivered earns a vouching fee, a broker whose source
+  underdelivered is slashed on-chain. Reputation is capital at risk, not a score
+  you are asked to trust. This is the ERC-8004 idea, made economic on Arc.
 - **Claim a wallet.** A creator registers their content and any wallet they
   control. When an answer is grounded in it, they earn, and can withdraw
   on-chain and verify on ArcScan.
@@ -43,7 +51,8 @@ actually grounded in, and by how much. That verifier is the product.
 
 Because Gateway batches, per-payment we get a Gateway transfer id, not a block
 hash. The genuinely on-chain, ArcScan-verifiable transactions are the treasury's
-**deposits** and each source's **withdrawal**.
+**deposits**, each source's **withdrawal**, and every **bond slash or vouching
+reward** on `/trust` (each a direct USDC transfer with its own tx hash).
 
 ## Architecture
 
@@ -56,10 +65,20 @@ anti-slop rules. Durable state on Vercel KV with in-memory fallback.
 - `lib/verifier.ts` the attribution verifier: `(question, answer, sources)` to
   per-source weights. Gemini, with a transparent heuristic fallback.
 - `lib/arc.ts` the Arc layer: Gateway deposit, x402 pay, earnings read, on-chain
-  settle.
+  settle, and a raw on-chain USDC transfer for bond slashes and rewards.
+- `lib/ground.ts` the shared grounding core: retrieve, answer, verify, settle a
+  per-citation toll. Used by both the ask route and the agent.
+- `lib/agent.ts` the autonomous agent: plan, decide, ground, reflect on coverage,
+  adapt, honour the budget, and stop early. Streamed by `app/api/agent/run`.
+- `lib/bonds.ts` the reputation-bond engine: brokers, their staked USDC bonds,
+  and the verifier-driven reward/slash settlement. Served by `app/api/bonds`.
 - `lib/registry.ts` the creator claim store. `lib/rss.ts` live RSS sources.
 - `lib/ledger.ts` durable ledger. `lib/ratelimit.ts` per-IP limits. `lib/kv.ts`
   the KV connection.
+
+The pages are distinct surfaces onto the same verifier and rail: `/try` asks and
+runs the agent, `/trust` stakes and slashes reputation bonds, `/sources` registers
+creators, `/s/[wallet]` is a source's earnings and withdrawal.
 
 ### Exact Arc / Circle call sites
 
@@ -68,10 +87,14 @@ anti-slop rules. Durable state on Vercel KV with in-memory fallback.
   `BatchFacilitatorClient` (`@circle-fin/x402-batching/server`), paid to the
   source's wallet.
 - `lib/arc.ts` the buyer: `GatewayClient` (`@circle-fin/x402-batching/client`):
-  `deposit`, `getBalances`, `pay`, plus a viem on-chain transfer for withdrawals.
-  Arc testnet `eip155:5042002`, USDC `0x3600…0000`, Gateway `0x0077…19B9`.
+  `deposit`, `getBalances`, `pay`, plus a viem on-chain transfer for withdrawals,
+  bond slashes, and vouching rewards. Arc testnet `eip155:5042002`, USDC
+  `0x3600…0000`, Gateway `0x0077…19B9`.
 - `app/api/ground/route.ts` retrieve, answer, verify, then settle each grounded
-  source's share. `app/api/agent/plan/route.ts` the agent's planning step.
+  source's share (core in `lib/ground.ts`).
+- `app/api/agent/run/route.ts` streams the autonomous agent's decisions as
+  server-sent events. `app/api/bonds/route.ts` runs a bond evaluation and settles
+  the reward/slash on-chain.
 
 A standalone Phase 0 spike proving the rail and verifier in isolation is in
 `spike/` (`npm run spike`).
@@ -91,9 +114,13 @@ npm run dev
 
 ## Judging fit
 
-- **Agentic:** the research agent plans, budgets, decides what to pay, and stops
-  itself.
+- **Agentic:** the research agent runs a real decide-act-observe-reflect loop. It
+  forms its own follow-up questions, refuses to pay weak sources, judges its own
+  coverage, and stops early when the goal is met rather than spending to zero.
 - **Traction:** real test-USDC settles on every answer; creators can register a
-  wallet and withdraw what they earned.
-- **Circle tools:** x402, Gateway nanopayments, USDC, Arc, end to end.
-- **Innovation:** the attribution verifier as the pricing function.
+  wallet and withdraw what they earned; the ledger is a running record anyone can
+  point to.
+- **Circle tools:** x402, Gateway nanopayments, USDC, Arc, end to end, plus raw
+  on-chain USDC transfers for bond settlement.
+- **Innovation:** the attribution verifier as both the pricing function and the
+  slashing oracle for agent reputation bonds, the near-empty ERC-8004 lane.
