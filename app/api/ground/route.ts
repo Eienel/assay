@@ -1,19 +1,14 @@
 import { NextResponse } from 'next/server';
-import { retrieve } from '@/lib/retrieve';
-import { groundedAnswer } from '@/lib/answer';
-import { attribute } from '@/lib/verifier';
-import { ensureDeposit, getGateway, payToSource } from '@/lib/arc';
-import { record } from '@/lib/ledger';
+import { groundQuestion } from '@/lib/ground';
 import { rateLimit, clientIp } from '@/lib/ratelimit';
-import type { GroundResult, Settlement } from '@/lib/types';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
 export const maxDuration = 60;
 
-// The whole flow: retrieve sources, answer the question grounded in them, verify
-// which sources the answer actually used, then settle a toll split across those
-// sources as real nanopayments on Arc.
+// Retrieve sources, answer the question grounded in them, verify which sources
+// the answer actually used, then settle a per-citation toll to each as real
+// nanopayments on Arc. The core lives in lib/ground.ts, shared with the agent.
 export async function POST(request: Request) {
   try {
     const limit = await rateLimit(`ground:${clientIp(request)}`, 12, 60);
@@ -29,68 +24,8 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Ask a question.' }, { status: 400 });
     }
 
-    // Price per citation, not a flat fee. Each source the answer genuinely used
-    // earns a base rate, scaled by how much it contributed. So an answer that
-    // leans on more sources, or leans harder on one, pays more. Capped so a
-    // single answer can never drain the funder.
-    const rate = parseFloat(process.env.OBOL_RATE_PER_CITATION ?? process.env.OBOL_TOLL_USDC ?? '0.0015');
-    const maxToll = parseFloat(process.env.OBOL_MAX_TOLL_USDC ?? '0.02');
-
-    const retrieved = await retrieve(question, 4);
-    const { answer } = await groundedAnswer(question, retrieved);
-    const { sources, method } = await attribute(question, answer, retrieved);
-
-    const byId = new Map(retrieved.map((r) => [r.id, r]));
-    const grounded = sources.filter((s) => s.grounded && s.weight > 0);
-    const n = grounded.length;
-    const cap = Math.round(maxToll * 1e6);
-    let running = 0;
-    const settlements: Settlement[] = grounded.map((s) => {
-      const src = byId.get(s.id)!;
-      // weight sums to 1, so weight * n averages to 1 per source: total scales
-      // with the number of grounded sources, each share set by contribution.
-      let micros = Math.max(1, Math.round(rate * 1e6 * s.weight * n));
-      micros = Math.min(micros, Math.max(1, cap - running));
-      running += micros;
-      return {
-        sourceId: s.id,
-        name: s.name,
-        handle: s.handle,
-        payTo: src.payTo,
-        micros,
-        amountUsdc: (micros / 1e6).toFixed(6),
-      };
-    });
-
-    // Settle live on Arc when a funder key is present.
-    let live = false;
     const origin = new URL(request.url).origin;
-    if (getGateway() && settlements.length) {
-      try {
-        const total = settlements.reduce((s, x) => s + x.micros, 0);
-        await ensureDeposit(total);
-        for (const s of settlements) {
-          s.txId = await payToSource(origin, s.sourceId, s.payTo, s.micros);
-        }
-        live = true;
-      } catch (e) {
-        console.error('[obol] settlement failed:', (e as Error).message);
-      }
-    }
-
-    const result: GroundResult = {
-      id: `g-${Date.now()}`,
-      question: question.trim(),
-      answer,
-      sources,
-      settlements,
-      tollUsdc: rate,
-      settledMicros: settlements.reduce((s, x) => s + x.micros, 0),
-      method,
-      live,
-      ts: Date.now(),
-    };
-    await record(result);
+    const result = await groundQuestion(question.trim(), origin);
     return NextResponse.json(result);
   } catch (e) {
     return NextResponse.json({ error: (e as Error).message }, { status: 500 });

@@ -9,4 +9,6 @@ export const tokens = {
   muted: '#93A09A', // secondary text, muted green-gray
   accent: '#3FB68C', // mint verdigris: settled / paid / primary action only
   accentSoft: 'rgba(63,182,140,0.14)', // quiet wash of the accent
+  rust: '#C97A56', // oxidized copper: slashed / declined / at-risk, used sparingly
+  rustSoft: 'rgba(201,122,86,0.14)', // quiet wash of the rust
 } as const;
