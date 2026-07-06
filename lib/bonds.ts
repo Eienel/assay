@@ -3,7 +3,7 @@ import { createHash } from 'node:crypto';
 import { hasKv, kv } from './kv';
 import { SOURCES } from './sources';
 import { groundQuestion } from './ground';
-import { sendOnChain, treasuryAddress } from './arc';
+import { sendOnChain } from './arc';
 
 // Reputation you post as collateral, not a score you ask to be trusted.
 //
@@ -65,6 +65,11 @@ export function reputation(b: Broker): number {
   const bondHealth = b.stakedMicros ? b.bondMicros / b.stakedMicros : 0;
   return Math.round(100 * (0.6 * hitRate + 0.4 * bondHealth));
 }
+
+// A dedicated penalty vault: slashed bond forfeits here on-chain, so a slash
+// reads as value genuinely leaving the escrow rather than a self-transfer.
+const PENALTY_VAULT =
+  ('0x' + createHash('sha256').update('assay:penalty-vault').digest('hex').slice(0, 40)) as `0x${string}`;
 
 const g = globalThis as unknown as { __assayBrokers?: Broker[] };
 
@@ -139,7 +144,7 @@ export async function evaluate(question: string, origin: string): Promise<EvalRe
   const r = await groundQuestion(question, origin, { minWeight: 0 });
   const brokers = await listBrokers();
   const byId = new Map(brokers.map((b) => [b.backsSourceId, b]));
-  const penaltyTo = treasuryAddress(); // slashed bonds return to the escrow/treasury
+  const penaltyTo = PENALTY_VAULT; // slashed bond forfeits on-chain to the penalty vault
 
   const judgments: Judgment[] = [];
   // Only sources the answer actually consulted put their broker's bond at risk.
